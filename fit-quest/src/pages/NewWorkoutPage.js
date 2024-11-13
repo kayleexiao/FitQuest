@@ -1,7 +1,7 @@
 import Navbar from '../components/NavBar';
 import { Container } from '@mantine/core';
 
-function SavedPage() {
+function NewWorkoutPage() {
   return (
     <Container>
       <Navbar />
@@ -9,4 +9,4 @@ function SavedPage() {
   );
 }
 
-export default SavedPage;
+export default NewWorkoutPage;
