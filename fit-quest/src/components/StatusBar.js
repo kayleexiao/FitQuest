@@ -14,7 +14,7 @@ function Statusbar() {
           top: 0,
           left: 0,
           right: 0,
-          backgroundColor: '#ffffff',
+          backgroundColor: 'rgba(0,0,0,0)',
           padding: '10px 20px',
           display: 'flex',
           justifyContent: 'space-between',
@@ -22,15 +22,15 @@ function Statusbar() {
         }}
       >
         {/* Left side: Clock */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', paddingLeft: '20px'}}>
           <Clock />
         </div>
   
         {/* Right side: Icons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', paddingRight: '20px'}}>
           <MdOutlineSignalCellularAlt size={30} />
           <IoIosWifi size={30} />
-          <BatteryIcon /> {/* Battery icon component for dynamic display */}
+          <BatteryIcon />
         </div>
       </Container>
     );
