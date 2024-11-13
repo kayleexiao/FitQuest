@@ -10,7 +10,7 @@ function App() {
         <Container style={{ padding: '2rem', textAlign: 'center' }}>
           <Routes>
             <Route path="/" element={<ExplorePage />} />
-            <Route path="/calendar" element={<CalenderPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/saved" element={<SavedPage />} />
             <Route path="/workout" element={<WorkoutPage />} />
