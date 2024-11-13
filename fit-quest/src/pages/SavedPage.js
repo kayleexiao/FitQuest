@@ -6,7 +6,7 @@ function SavedPage() {
   return (
     <Container>
       <Navbar />
-      <Statusbat />
+      <Statusbar />
     </Container>
   );
 }
