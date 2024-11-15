@@ -80,7 +80,7 @@ function WorkoutPage() {
         })}
 
         {/* Finish Workout Button Styled to Match the Design */}
-        <Link to="/saved" style={{ flex: 1, textAlign: 'center'}}>
+        <Link to="/saved" style={{ flex: 1, textAlign: 'center', textDecoration: 'none'}}>
           <Button
             fullWidth
             variant="filled"
