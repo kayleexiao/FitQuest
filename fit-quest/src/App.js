@@ -13,7 +13,7 @@ function App() {
   return (
     <MantineProvider theme={{ colorScheme: 'light' }} withGlobalStyles withNormalizeCSS>
       <Router>
-        <Container style={{ padding: '2rem', textAlign: 'center' }}>
+        <Container style={{ padding: '1rem', textAlign: 'center' }}>
           <Routes>
             <Route path="/" element={<ExplorePage />} />
             <Route path="/calendar" element={<CalendarPage />} />
