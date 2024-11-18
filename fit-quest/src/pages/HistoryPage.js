@@ -1,6 +1,6 @@
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
-import { Container, Text, Box, Stack } from '@mantine/core';
+import { Container, Stack } from '@mantine/core';
 import { IoIosArrowDropright } from "react-icons/io";
 import { UnstyledButton } from '@mantine/core';
 import { useState } from 'react';
@@ -26,7 +26,7 @@ function HistoryPage() {
   ];
 
   const [expandedItems, setExpandedItems] = useState({});
-  const [isScrolled, setIsScrolled] = useState(false);
+  const isScrolled = false;
 
   const toggleItem = (id) => {
     setExpandedItems(prev => ({
