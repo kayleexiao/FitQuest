@@ -193,18 +193,18 @@ function ExplorePage() {
                   padding: '16px 20px',
                 }}>
                   {/* Save Icon in Top Right */}
-                  <Text 
-                    size="xl" 
+                  <img 
+                    src="/Bookmark.png"
+                    alt="bookmark"
                     style={{ 
-                      cursor: 'pointer', 
-                      fontSize: '22px',
+                      cursor: 'pointer',
                       position: 'absolute',
                       top: '12px',
                       right: '20px',
-                    }}
-                  >
-                    ☆
-                  </Text>
+                      width: '24px',  // Adjust size as needed
+                      height: '24px', // Adjust size as needed
+    }}
+  />
 
                   {/* Workout Content */}
                   <div style={{ 
