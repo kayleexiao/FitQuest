@@ -28,18 +28,19 @@ const YearMenu = ({ onYearSelect }) => {
                 cursor: 'pointer',
                 boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
                 backgroundColor: '#356B77',
-                minWidth: '153.5px',
-                width: '100%',
+                height: '5vh',
+                width: '35vw',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                color: 'white'
+                color: 'white',
+                fontSize: '1.72vh'
             }}>
                 {selectedYear}
                 <IoIosArrowDropdown 
                     style={{
                         marginLeft: '10px',
-                        fontSize: '20px',
+                        fontSize: '2.15vh',
                         transition: 'transform 0.3s ease',
                         transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                     }} 
@@ -69,7 +70,7 @@ const YearMenu = ({ onYearSelect }) => {
                                 color: '#356B77',
                                 display: 'flex',
                                 alignItems: 'center',
-                                fontSize: '15.6px',
+                                fontSize: '1.72vh',
                                 backgroundColor: year === selectedYear ? 'rgba(0,0,0,0.05)' : 'transparent',
                             }}
                         >
