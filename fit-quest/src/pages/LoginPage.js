@@ -21,7 +21,16 @@ function LoginPage() {
 
   const validateFields = () => {
     const newErrors = {};
-    if (!email) newErrors.email = true;
+  
+    if (!email) {
+      newErrors.email = 'Missing Email';
+    } else if (!isLogin) {
+      const emailExists = testCredentials.some((cred) => cred.email === email);
+      if (emailExists) {
+        newErrors.email = 'Email already used';
+      }
+    }
+  
     if (!password) newErrors.password = true;
   
     if (isLogin) {
@@ -42,6 +51,7 @@ function LoginPage() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  
 
   const handleButtonClick = (e) => {
     e.preventDefault();
@@ -137,10 +147,11 @@ function LoginPage() {
                 fontSize: '1.41vh',
                 width: '68.7vw',
                 textAlign: 'left',
-                color: errors.email === 'Invalid Login' ? 'red' : 'grey',
+                color: errors.email === 'Email already used' || errors.email === 'Invalid Login' ? 'red' : 'grey',
             }}
             >
-            Email {errors.email === 'Invalid Login' && '(Invalid Login)'}
+            Email {errors.email === 'Email already used' && '(Email already used)'}
+            {errors.email === 'Invalid Login' && '(Invalid Login)'}
             </label>
             <input
             type="email"
@@ -159,7 +170,7 @@ function LoginPage() {
                 borderRadius: '5px',
                 paddingLeft: '15px',
             }}
-            />
+        />
 
         <label
           htmlFor="password"
