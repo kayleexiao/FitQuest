@@ -1,7 +1,8 @@
 // App.js
 import { Container, MantineProvider } from '@mantine/core';
 import React from 'react';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
 import ExplorePage from './pages/ExplorePage';
 import CalendarPage from './pages/CalendarPage';
 import HistoryPage from './pages/HistoryPage';
@@ -15,7 +16,9 @@ function App() {
       <Router>
         <Container style={{ padding: '2rem', textAlign: 'center' }}>
           <Routes>
-            <Route path="/" element={<ExplorePage />} />
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/explore" element={<ExplorePage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/saved" element={<SavedPage />} />
