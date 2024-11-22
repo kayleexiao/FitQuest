@@ -488,6 +488,41 @@ function SavedPage() {
                 }
               }}
             />
+            {isFilterOpen && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                backgroundColor: 'white',
+                borderRadius: '10px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                zIndex: 1000,
+                marginTop: '5px',
+                minWidth: '150px'
+              }}>
+                {['Recent (Latest)', 'Recent (Oldest)', 'Name (A to Z)', 'Name (Z to A)'].map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => handleSortSelection(option)}
+                    style={{
+                      width: '100%',
+                      padding: '10px 15px',
+                      border: 'none',
+                      background: 'none',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      color: selectedSort === option ? '#356B77' : '#666',
+                      fontWeight: selectedSort === option ? '500' : 'normal',
+                      ':hover': {
+                        backgroundColor: '#f5f5f5'
+                      }
+                    }}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
             <UnstyledButton
               onClick={() => setIsRecoveryModalOpen(true)}
               style={{
@@ -519,6 +554,7 @@ function SavedPage() {
           alignItems: 'center',
           width: '100%',
           maxWidth: '100%',
+          paddingBottom: '100px'
         }}
       >
         {filteredAndSortedItems.length > 0 ? (
@@ -526,7 +562,8 @@ function SavedPage() {
             <div key={index} style={{ 
               width: '99%',
               maxWidth: '99%',
-              margin: '0 auto'
+              margin: '0 auto',
+              marginBottom: openMenu === index ? '100px' : '10px'
             }}>
               <UnstyledButton
                 onClick={() => toggleItem(index)}
