@@ -35,44 +35,25 @@ function NewWorkoutPage() {
       </div>
 
       {/* Scrollable Content */}
-      <Container
-        style={{
-          paddingBottom: '90px',
-          paddingTop: '10px',
-          maxWidth: '100%',
-          margin: 'auto',
-          overflowY: 'auto',
-        }}
-      >
+      <Container style={{ paddingBottom: '90px', paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
         <Navbar />
 
         {/* Title Section */}
-        <Group position="apart" style={{ marginTop: '3rem', justifyContent: 'space-between' }}>
+        <Group position="apart" style={{ marginTop: '2rem', justifyContent: 'space-between' }}>
           {isEditingTitle ? (
             <input
               type="text"
               value={workoutTitle}
               onChange={(e) => setWorkoutTitle(e.target.value)}
               onBlur={() => setIsEditingTitle(false)}
-              style={{
-                fontSize: '24px',
-                fontWeight: '700',
-                border: 'none',
-                outline: 'none',
-                background: 'transparent',
-                color: '#356B77',
-              }}
+              style={{ fontSize: '24px', fontWeight: '700', border: 'none', outline: 'none', background: 'transparent', color: '#356B77' }}
             />
           ) : (
             <Text size="2xl" weight={700} style={{ fontSize: '30px', color: '#356B77' }}>
               {workoutTitle}
             </Text>
           )}
-          <ActionIcon
-            variant="transparent"
-            onClick={() => setIsEditingTitle(true)}
-            style={{ color: '#356B77' }}
-          >
+          <ActionIcon variant="transparent" onClick={() => setIsEditingTitle(true)} style={{ color: '#356B77' }}>
             <MdEdit size={24} />
           </ActionIcon>
         </Group>
@@ -82,29 +63,11 @@ function NewWorkoutPage() {
           {exercises.length > 0 ? (
             exercises.map((exercise, index) => {
               if (exercise.type === 'weight') {
-                return (
-                  <WeightExerciseCard
-                    key={index}
-                    title={exercise.title}
-                    onDelete={() => handleDeleteExercise(index)}
-                  />
-                );
+                return <WeightExerciseCard key={index} title={exercise.title} onDelete={() => handleDeleteExercise(index)} />;
               } else if (exercise.type === 'bodyweight') {
-                return (
-                  <BodyweightExerciseCard
-                    key={index}
-                    title={exercise.title}
-                    onDelete={() => handleDeleteExercise(index)}
-                  />
-                );
+                return <BodyweightExerciseCard key={index} title={exercise.title} onDelete={() => handleDeleteExercise(index)} />;
               } else if (exercise.type === 'timed') {
-                return (
-                  <TimedExerciseCard
-                    key={index}
-                    title={exercise.title}
-                    onDelete={() => handleDeleteExercise(index)}
-                  />
-                );
+                return <TimedExerciseCard key={index} title={exercise.title} onDelete={() => handleDeleteExercise(index)} />;
               }
               return null;
             })
@@ -119,23 +82,16 @@ function NewWorkoutPage() {
 
         {/* Add Exercise Button */}
         <ActionIcon
-                variant="filled"
-                size="lg"
-                style={{
-                  backgroundColor: '#356B77',
-                  color: 'white',
-                  width: '30px',
-                  height: '30px',
-                  borderRadius: '50%',
-                  marginBottom: '20px',
-                }}
-                onClick={handleAddExercise}
-              >
-                <MdAdd size={24} />
-              </ActionIcon>
+          variant="filled"
+          size="lg"
+          style={{ backgroundColor: '#356B77', color: 'white', width: '30px', height: '30px', borderRadius: '50%', marginBottom: '20px' }}
+          onClick={handleAddExercise}
+        >
+          <MdAdd size={24} />
+        </ActionIcon>
 
         {/* Finish Workout */}
-        <Group position="center" style={{ marginTop: '3rem'}}>
+        <Group position="center" style={{ marginTop: '3rem' }}>
           <Button
             disabled={!exercises.length}
             variant="filled"
@@ -148,7 +104,7 @@ function NewWorkoutPage() {
               width: '100%',
               height: '3rem',
               textAlign: 'center',
-              letterSpacing: '0.2rem'
+              letterSpacing: '0.2rem',
             }}
           >
             Finish Workout

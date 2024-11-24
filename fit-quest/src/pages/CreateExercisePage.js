@@ -11,16 +11,11 @@ function CreateExercisePage() {
   const [selectedType, setSelectedType] = useState('');
 
   const handleAddExercise = () => {
-    const newExercise = {
-      title: exerciseTitle.trim() || 'Untitled',
-      type: selectedType,
-    };
+    const newExercise = { title: exerciseTitle.trim() || 'Untitled', type: selectedType };
 
-    // Add to currentWorkout in localStorage
     const currentWorkout = JSON.parse(localStorage.getItem('currentWorkout')) || [];
     localStorage.setItem('currentWorkout', JSON.stringify([...currentWorkout, newExercise]));
 
-    // Add to recentExercises in localStorage
     const recentExercises = JSON.parse(localStorage.getItem('recentExercises')) || [];
     const isDuplicate = recentExercises.some(
       (exercise) => exercise.title === newExercise.title && exercise.type === newExercise.type
@@ -29,30 +24,17 @@ function CreateExercisePage() {
       localStorage.setItem('recentExercises', JSON.stringify([...recentExercises, newExercise]));
     }
 
-    // Navigate back to NewWorkoutPage
     navigate('/new-workout');
   };
 
   return (
     <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
-      {/* Fixed Status Bar */}
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1, maxWidth: '100%', margin: 'auto', backgroundColor: '#fff' }}>
         <Statusbar />
       </div>
 
-      {/* Scrollable Content */}
-      <Container
-        style={{
-          paddingBottom: '90px',
-          paddingTop: '10px',
-          maxWidth: '100%',
-          margin: 'auto',
-          overflowY: 'auto',
-        }}
-      >
+      <Container style={{ paddingBottom: '90px', paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
         <Navbar />
-
-        {/* Back Button and Title */}
         <Group position="apart" style={{ marginTop: '2rem', marginBottom: '2rem' }}>
           <ActionIcon onClick={() => navigate('/add-exercise')} size="lg" style={{ backgroundColor: 'transparent' }}>
             <MdArrowBack size={34} color="#356B77" />
@@ -62,21 +44,14 @@ function CreateExercisePage() {
           </Text>
         </Group>
 
-        {/* Exercise Name Input */}
         <TextInput
           placeholder="Enter Exercise Name"
           value={exerciseTitle}
           onChange={(e) => setExerciseTitle(e.target.value)}
           variant="unstyled"
-          style={{
-            marginBottom: '2rem',
-            backgroundColor: '#dddddd',
-            borderRadius: '30px',
-            paddingLeft: '1rem',
-          }}
+          style={{ marginBottom: '2rem', backgroundColor: '#dddddd', borderRadius: '30px', paddingLeft: '1rem' }}
         />
 
-        {/* Select Exercise Type */}
         <Text size="xl" weight={500} style={{ textAlign: 'left', marginBottom: '1rem', color: '#356B77' }}>
           Choose your exercise type
         </Text>
@@ -91,7 +66,7 @@ function CreateExercisePage() {
               borderRadius: '30px',
               height: '7rem',
               fontSize: '30px',
-              lineHeight: '2.5rem'
+              lineHeight: '2.5rem',
             }}
           >
             Weight-Based <br /> Exercise
@@ -106,10 +81,10 @@ function CreateExercisePage() {
               borderRadius: '30px',
               height: '7rem',
               fontSize: '30px',
-              lineHeight: '2.5rem'
+              lineHeight: '2.5rem',
             }}
           >
-            Bodyweight <br />Exercise
+            Bodyweight <br /> Exercise
           </Button>
           <Button
             fullWidth
@@ -121,14 +96,13 @@ function CreateExercisePage() {
               borderRadius: '30px',
               height: '7rem',
               fontSize: '30px',
-              lineHeight: '2.5rem'
+              lineHeight: '2.5rem',
             }}
           >
             Timed <br /> Exercise
           </Button>
         </Group>
 
-        {/* Add to Workout Button */}
         <Button
           fullWidth
           onClick={handleAddExercise}
@@ -146,8 +120,6 @@ function CreateExercisePage() {
           Add to Workout
         </Button>
       </Container>
-
-      {/* Navbar */}
       <Navbar />
     </div>
   );
