@@ -22,7 +22,7 @@ function Statusbar() {
         }}
       >
         {/* Left side: Clock */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', paddingLeft: '20px'}}>
           <Clock />
         </div>
   
