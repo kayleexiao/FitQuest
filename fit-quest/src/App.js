@@ -8,12 +8,14 @@ import HistoryPage from './pages/HistoryPage';
 import SavedPage from './pages/SavedPage';
 import WorkoutPage from './pages/WorkoutPage';
 import NewWorkoutPage from './pages/NewWorkoutPage';
+import CreateExercisePage from './pages/CreateExercisePage';
+import AddExercisePage from './pages/AddExercisePage';
 
 function App() {
   return (
     <MantineProvider theme={{ colorScheme: 'light' }} withGlobalStyles withNormalizeCSS>
       <Router>
-        <Container style={{ padding: '2rem', textAlign: 'center' }}>
+        <Container style={{ padding: '1rem', textAlign: 'center' }}>
           <Routes>
             <Route path="/" element={<ExplorePage />} />
             <Route path="/calendar" element={<CalendarPage />} />
@@ -21,6 +23,9 @@ function App() {
             <Route path="/saved" element={<SavedPage />} />
             <Route path="/workout" element={<WorkoutPage />} />
             <Route path="/new-workout" element={<NewWorkoutPage />} />
+            <Route path="/create-exercise" element={<CreateExercisePage />} />
+            <Route path="/add-exercise" element={<AddExercisePage />} />
+
           </Routes>
         </Container>
       </Router>
