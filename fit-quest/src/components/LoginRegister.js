@@ -7,12 +7,12 @@ function LoginRegister({ isLogin, toggleView }) {
         width: '92.62vw',
         height: '4.23vh',
         backgroundColor: '#EBEBEB',
-        borderRadius: 'min(2.54vw, 1.17vh)',
+        borderRadius: 'min(2.54vw, 1.87vh)',
         display: 'flex',
         alignItems: 'center',
         position: 'relative',
         cursor: 'pointer',
-        transition: 'all 0.3s ease-in-out',
+        transition: 'all 0.25s ease-in-out',
         padding: '0.2vh',
       }}
       onClick={toggleView}
@@ -24,9 +24,9 @@ function LoginRegister({ isLogin, toggleView }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '2vh',
+          fontSize: '1.8vh',
           color: isLogin ? 'white' : '#909090',
-          transition: 'color 0.3s ease-in-out',
+          transition: 'color 0.25s ease-in-out',
           position: 'absolute',
           left: '0',
         }}
@@ -41,9 +41,9 @@ function LoginRegister({ isLogin, toggleView }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '2vh',
+          fontSize: '1.8vh',
           color: !isLogin ? 'white' : '#909090',
-          transition: 'color 0.3s ease-in-out',
+          transition: 'color 0.25s ease-in-out',
           position: 'absolute',
           right: '0',
         }}
@@ -60,10 +60,10 @@ function LoginRegister({ isLogin, toggleView }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '2vh',
+          fontSize: '1.8vh',
           fontWeight: 'bold',
           color: 'black',
-          transition: 'all 0.3s ease-in-out',
+          transition: 'all 0.25s ease-in-out',
           transform: isLogin ? 'translateX(2%)' : 'translateX(120%)',
         }}
       >
