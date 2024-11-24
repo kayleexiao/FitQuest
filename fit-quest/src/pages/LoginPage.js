@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import Statusbar from '../components/StatusBar';
-import LoginRegister from '../components/LoginRegister';
 import { Container } from '@mantine/core';
+import React, { useState } from 'react';
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
+import LoginRegister from '../components/LoginRegister';
+import Statusbar from '../components/StatusBar';
 
 function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -73,10 +73,11 @@ function LoginPage() {
       <h1
         style={{
           color: '#356B77',
-          fontSize: '7.04vh',
-          fontWeight: '900',
+          fontSize: '7.5vh',
+          fontWeight: '1000',
           margin: '0',
-          marginTop: '13.73vh',
+          marginTop: '10vh',
+          letterSpacing: '0.1rem',
         }}
       >
         <i>FitQuest</i>
@@ -91,7 +92,6 @@ function LoginPage() {
           alignItems: 'center',
           textAlign: 'center',
           position: 'absolute',
-          marginTop: '3vh',
           left: '50%',
           transform: 'translate(-50%)',
         }}
@@ -125,7 +125,7 @@ function LoginPage() {
           width: '92.62vw',
           height: '4.58vh',
           position: 'absolute',
-          marginTop: '20vh',
+          marginTop: '18vh',
           left: '50%',
           transform: 'translate(-50%)',
         }}
@@ -138,7 +138,7 @@ function LoginPage() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          marginTop: '26vh',
+          marginTop: '25vh',
         }}
       >
         <label
