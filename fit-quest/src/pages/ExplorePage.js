@@ -80,19 +80,11 @@ function ExplorePage() {
           paddingRight: '4px',
         }}>
           {/* Greeting Section */}
-          <Box style={{ marginBottom: '16px', marginTop: '40px' }}>
+          <Box style={{ marginBottom: '16px', marginTop: '40px', alignItems: 'center', justifyContent: 'left' }}>
             <Text
-              style={{
-                color: '#356B77',
-                fontSize: '28px',
-                fontFamily: 'ABeeZee, sans-serif',
-                fontStyle: 'italic',
-                fontWeight: 500,
-                textAlign: 'left',
-                marginBottom: '4px',
-              }}
+              style={{ textAlign: 'left', fontSize: '3.86vh', color: '#356B77', fontWeight: 650, marginRight: '1vw' }}
             >
-              Hello User!
+              <i>Hello User!</i>
             </Text>
             <Text
               style={{

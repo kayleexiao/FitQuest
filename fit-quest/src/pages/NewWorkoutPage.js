@@ -49,8 +49,8 @@ function NewWorkoutPage() {
               style={{ fontSize: '24px', fontWeight: '700', border: 'none', outline: 'none', background: 'transparent', color: '#356B77' }}
             />
           ) : (
-            <Text size="2xl" weight={700} style={{ fontSize: '30px', color: '#356B77' }}>
-              {workoutTitle}
+            <Text style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650, marginRight: '1vw'  }}>
+              <i> {workoutTitle} </i>
             </Text>
           )}
           <ActionIcon variant="transparent" onClick={() => setIsEditingTitle(true)} style={{ color: '#356B77' }}>

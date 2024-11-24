@@ -30,12 +30,6 @@ function SavedPage() {
   const [deletedWorkouts, setDeletedWorkouts] = useState([]);
   const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
 
-  const currentDate = new Date().toLocaleDateString('en-US', { 
-    month: '2-digit', 
-    day: '2-digit', 
-    year: '2-digit' 
-  });
-
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
@@ -377,6 +371,7 @@ function SavedPage() {
       <Navbar style={{ 
         position: 'fixed', 
         bottom: 0, 
+        
         left: 0, 
         right: 0, 
         zIndex: 9999,

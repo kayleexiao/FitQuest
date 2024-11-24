@@ -38,8 +38,8 @@ function AddExercisePage() {
           <ActionIcon onClick={() => navigate('/new-workout')} size="lg" style={{ backgroundColor: 'transparent' }}>
             <MdArrowBack size={34} color="#356B77" />
           </ActionIcon>
-          <Text size="xl" weight={600} style={{ fontSize: '28px', color: '#356B77' }}>
-            Add Exercise
+          <Text size="xl" weight={650} style={{ fontSize: '28px', color: '#356B77' }}>
+            <i>Add Exercise</i>
           </Text>
         </Group>
 
