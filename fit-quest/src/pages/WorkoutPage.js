@@ -1,13 +1,13 @@
 // pages/WorkoutPage.js
+import { ActionIcon, Button, Container, Group, Text } from '@mantine/core';
 import React, { useState } from 'react';
+import { MdBookmark, MdBookmarkBorder, MdStar, MdStarBorder } from 'react-icons/md';
 import { Link } from 'react-router-dom';
-import { Container, Text, Group, ActionIcon, Button } from '@mantine/core';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
-import WeightExerciseCard from '../components/exercise/WeightExerciseCard';
 import BodyweightExerciseCard from '../components/exercise/BodyweightExerciseCard';
-import CardioExerciseCard from '../components/exercise/CardioExerciseCard';
-import { MdBookmark, MdBookmarkBorder, MdStar, MdStarBorder } from 'react-icons/md';
+import TimedExerciseCard from '../components/exercise/TimedExerciseCard';
+import WeightExerciseCard from '../components/exercise/WeightExerciseCard';
 
 function WorkoutPage() {
   const [bookmarked, setBookmarked] = useState(false);
@@ -16,7 +16,7 @@ function WorkoutPage() {
   const [exercises, setExercises] = useState([
     { id: 1, type: 'weight', title: 'Weight Exercise' },
     { id: 2, type: 'bodyweight', title: 'Bodyweight Exercise' },
-    { id: 3, type: 'cardio', title: 'Cardio Exercise' },
+    { id: 3, type: 'timed', title: 'Timed Exercise' },
   ]);
 
   // Function to delete an exercise by ID
@@ -25,20 +25,20 @@ function WorkoutPage() {
   };
 
   return (
-    <div style={{ position: 'relative', maxWidth: '430px', margin: 'auto' }}>
+    <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
       {/* Fixed Status Bar */}
-      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1, maxWidth: '430px', margin: 'auto', backgroundColor: '#fff' }}>
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1, maxWidth: '100%', margin: 'auto', backgroundColor: '#fff' }}>
         <Statusbar />
       </div>
 
       {/* Scrollable Content Container */}
-      <Container style={{ paddingBottom: '90px', maxWidth: '430px', margin: 'auto', overflowY: 'auto' }}>
+      <Container style={{ paddingBottom: '90px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
         {/* Navbar */}
         <Navbar />
 
         {/* Title and Bookmark */}
         <Group position="apart" style={{ marginTop: '3rem', justifyContent: 'space-between' }}>
-          <Text size="2xl" weight={700} style={{ fontSize: '45px' }}>TITLE</Text>
+          <Text size="2xl" weight={700} style={{ fontSize: '30px' }}>TITLE</Text>
           <ActionIcon variant="transparent" onClick={() => setBookmarked(!bookmarked)}>
             {bookmarked ? <MdBookmark size={45} color="#356B77" /> : <MdBookmarkBorder size={45} color="#356B77" />}
           </ActionIcon>
@@ -67,9 +67,9 @@ function WorkoutPage() {
                 onDelete={() => deleteExercise(exercise.id)}
               />
             );
-          } else if (exercise.type === 'cardio') {
+          } else if (exercise.type === 'timed') {
             return (
-              <CardioExerciseCard
+              <TimedExerciseCard
                 key={exercise.id}
                 title={exercise.title}
                 onDelete={() => deleteExercise(exercise.id)}

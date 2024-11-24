@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Group, Text, TextInput, Button, ActionIcon, Container } from '@mantine/core';
 import { MdExpandMore, MdChevronRight, MdEdit, MdDelete } from 'react-icons/md';
 
-function CardioExerciseCard({ title = "Cardio Exercise", onDelete }) {
+function TimedExerciseCard({ title = "Timed Exercise", onDelete }) {
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0); // Time in seconds
   const [expanded, setExpanded] = useState(false);
@@ -123,4 +123,4 @@ function CardioExerciseCard({ title = "Cardio Exercise", onDelete }) {
   );
 }
 
-export default CardioExerciseCard;
+export default TimedExerciseCard;
