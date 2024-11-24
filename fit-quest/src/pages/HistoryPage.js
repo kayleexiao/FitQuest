@@ -10,14 +10,14 @@ function HistoryPage() {
   // Updated mock data structure
   const historyEntries = [
     { 
-      date: 'January 15, 2024',
+      date: '01/15/2024',
       items: [
         { title: 'Morning Workout', time: '9:00 AM' },
         { title: 'Evening Run', time: '6:30 PM' }
       ]
     },
     {
-      date: 'January 14, 2024',
+      date: '01/14/2024',
       items: [
         { title: 'Strength Training', time: '10:00 AM' },
         { title: 'Yoga Session', time: '4:00 PM' }
@@ -48,14 +48,14 @@ function HistoryPage() {
             alignItems: 'center',
             height: isScrolled ? '40px' : '60px',
             transition: 'all 0.3s ease',
-            padding: '0 2px',
+            padding: '0',
           }}
         >
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            justifyContent: 'flex-start', 
-            marginLeft: '2px'
+            justifyContent: 'flex-start',
+            marginLeft: '10px'
           }}>
             <span style={{ 
               fontSize: isScrolled ? '24px' : '36px', 
@@ -80,7 +80,7 @@ function HistoryPage() {
           fluid
           style={{ 
             padding: '0',
-            marginTop: '140px',
+            marginTop: '80px',
             marginBottom: '80px',
             display: 'flex',
             flexDirection: 'column',
@@ -93,9 +93,11 @@ function HistoryPage() {
             <div key={dateGroup.date} style={{ width: '99%', maxWidth: '99%', margin: '0 auto' }}>
               {/* Date Header */}
               <div style={{ 
-                padding: '10px 0', 
+                padding: '10px 12px', 
                 color: '#356B77', 
-                fontWeight: 600 
+                fontWeight: 600,
+                textAlign: 'left',
+                width: '100%'
               }}>
                 {dateGroup.date}
               </div>
