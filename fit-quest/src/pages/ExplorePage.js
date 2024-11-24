@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Container, Text, Group, Card, Box } from '@mantine/core';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
+import { MdBookmark, MdBookmarkBorder, MdStar, MdStarBorder } from 'react-icons/md';
+
 
 function ExplorePage() {
   // State to track the active tab
@@ -44,98 +46,88 @@ function ExplorePage() {
     ],
   };
 
-  return (
-    <Box style={{ 
-      height: '100vh',
-      display: 'flex', 
-      flexDirection: 'column',
-      overflow: 'hidden',
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-    }}>
-      <Container 
-        size="100%"
-        style={{ 
-          backgroundColor: '#ffffff', 
-          padding: '16px 4px',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        }}>
-        {/* Status bar and top navbar */}
-        <Statusbar />
-        <Navbar />
+    // Get the current date
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
 
-        {/* Fixed content wrapper */}
-        <Box style={{
-          flex: 1,
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          paddingLeft: '4px',
-          paddingRight: '4px',
-        }}>
-          {/* Greeting Section */}
-          <Box style={{ marginBottom: '16px', marginTop: '40px', alignItems: 'center', justifyContent: 'left' }}>
-            <Text
-              style={{ textAlign: 'left', fontSize: '3.86vh', color: '#356B77', fontWeight: 650, marginRight: '1vw' }}
-            >
-              <i>Hello User!</i>
-            </Text>
-            <Text
-              style={{
-                color: '#356B77',
-                fontSize: '16px',
-                fontFamily: 'ABeeZee, sans-serif',
-                fontStyle: 'italic',
-                fontWeight: 400,
-                textAlign: 'left',
-              }}
-            >
-              Today is MM/DD/YYYY
-            </Text>
-          </Box>
+  return (
+    <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
+      {/* Fixed Status Bar */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1, maxWidth: '100%', margin: 'auto', backgroundColor: '#fff' }}>
+        <Statusbar />
+      </div>
+      <Container style={{ paddingBottom: '90px', paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
+        <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem', marginBottom: '1rem', gap: 0 }}>
+        {/* Greeting Section */}
+          <Text
+            style={{
+              textAlign: 'left',
+              fontSize: '3.86vh',
+              color: '#356B77',
+              fontWeight: 650,
+              margin: 0,
+              padding: 0,
+            }}
+          >
+            <i>Hello User!</i>
+          </Text>
+          <Text
+            style={{
+              color: '#356B77',
+              fontSize: '18px',
+              fontWeight: 500,
+              textAlign: 'left',
+              marginBottom: '1rem',
+              padding: 0,
+            }}
+          >
+            Today is {currentDate}.
+          </Text>
+        </Group>
 
           {/* Training Selection Tabs */}
-          <Box
+          <Box // Box for the tab buttons
             style={{
               display: 'flex',
-              justifyContent: 'flex-start',
-              gap: '16px',
+              justifyContent: 'space-between',
               marginBottom: '24px',
             }}
           >
             {['Weight Lifting', 'Bodyweight', 'Cardio'].map((tab) => (
-              <Box
+              <Box // Box for each tab
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 style={{
                   cursor: 'pointer',
-                  textAlign: 'left',
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
                 }}
               >
-                <Text
+                <Text // Text for the tab label
                   style={{
                     color: activeTab === tab ? '#5FB7CD' : '#356B77',
                     fontSize: '18px',
-                    fontFamily: 'Inter, sans-serif',
                     fontWeight: activeTab === tab ? 600 : 400,
-                    marginBottom: '4px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   }}
                 >
                   {tab}
                 </Text>
                 {activeTab === tab && (
-                  <Box
+                  <Box // Underline for the active tab
                     style={{
                       height: '3px',
                       backgroundColor: '#5FB7CD',
                       borderRadius: '3px',
-                      width: '100%',
+                      marginTop: '4px',
+                      width: '100%'
                     }}
                   />
                 )}
@@ -204,7 +196,7 @@ function ExplorePage() {
                     overflow: 'hidden',
                   }}>
                     <Text
-                      size="lg"
+                      size="xl"
                       weight={500}
                       style={{
                         marginBottom: '4px',
@@ -218,20 +210,10 @@ function ExplorePage() {
                     >
                       {workout}
                     </Text>
-                    <Group spacing={4} align="center" noWrap style={{ height: '24px' }}>
-                      <Text size="sm" style={{ marginRight: '8px', fontSize: '14px' }}>Difficulty</Text>
-                      {[...Array(3)].map((_, i) => (
-                        <Text
-                          key={i}
-                          style={{
-                            color: i < 2 ? 'white' : 'rgba(255,255,255,0.5)',
-                            fontSize: '16px',
-                            lineHeight: '1',
-                          }}
-                        >
-                          ★
-                        </Text>
-                      ))}
+                    <Group justifyContent="apart" align="center" style={{ height: '24px' }}>
+                      <Text color="white" size="l" style={{ textAlign: "left", marginBottom: '1rem' }}>
+                        Difficulty: <MdStar color="white" /> <MdStar color="white" /> <MdStarBorder color="white" />
+                      </Text>
                     </Group>
                   </div>
 
@@ -253,12 +235,12 @@ function ExplorePage() {
               </Card>
             ))}
           </Box>
-        </Box>
 
         {/* Bottom Navigation Bar */}
         <Navbar />
       </Container>
-    </Box>
+
+    </div>
   );
 }
 
