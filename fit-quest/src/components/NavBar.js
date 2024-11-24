@@ -24,8 +24,8 @@ function Navbar() {
         alignItems: 'center',
       }}
     >
-      <Link to="/" style={{ flex: 1, textAlign: 'center' }}>
-        <MdOutlineExplore color={isActive('/') ? 'white' : '#86B0BA'} size={32} />
+      <Link to="/explore" style={{ flex: 1, textAlign: 'center' }}>
+        <MdOutlineExplore color={isActive('/explore') ? 'white' : '#86B0BA'} size={32} />
       </Link>
       <Link to="/new-workout" style={{ flex: 1, textAlign: 'center' }}>
         <MdAddCircleOutline color={isActive('/new-workout') ? 'white' : '#86B0BA'} size={32} />
