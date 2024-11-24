@@ -1,6 +1,6 @@
 import { ActionIcon, Button, Container, Group, Text } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
-import { MdAdd, MdEdit } from 'react-icons/md';
+import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 import BodyweightExerciseCard from '../components/exercise/BodyweightExerciseCard';
@@ -38,25 +38,36 @@ function NewWorkoutPage() {
       <Container style={{ paddingBottom: '90px', paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
         <Navbar />
 
-        {/* Title Section */}
-        <Group position="apart" style={{ marginTop: '2rem', justifyContent: 'space-between' }}>
-          {isEditingTitle ? (
-            <input
-              type="text"
-              value={workoutTitle}
-              onChange={(e) => setWorkoutTitle(e.target.value)}
-              onBlur={() => setIsEditingTitle(false)}
-              style={{ fontSize: '24px', fontWeight: '700', border: 'none', outline: 'none', background: 'transparent', color: '#356B77' }}
-            />
-          ) : (
-            <Text style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650, marginRight: '1vw'  }}>
-              <i> {workoutTitle} </i>
-            </Text>
-          )}
-          <ActionIcon variant="transparent" onClick={() => setIsEditingTitle(true)} style={{ color: '#356B77' }}>
-            <MdEdit size={24} />
-          </ActionIcon>
-        </Group>
+{/* Title Section */}
+<Group position="apart" style={{ marginTop: '2rem', justifyContent: 'space-between', alignItems: 'center' }}>
+  <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+    <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+      {isEditingTitle ? (
+        <input
+          type="text"
+          value={workoutTitle}
+          onChange={(e) => setWorkoutTitle(e.target.value)}
+          onBlur={() => setIsEditingTitle(false)} // Exit edit mode on blur
+          style={{ fontSize: '3.86vh', fontWeight: 650, border: 'none', outline: 'none', background: 'transparent', color: '#356B77', width: '100%' }}
+        />
+      ) : (
+        <Text style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650 }}>
+          <i>{workoutTitle}</i>
+        </Text>
+      )}
+    </div>
+    <ActionIcon
+      variant="transparent"
+      onClick={() => setIsEditingTitle((prev) => !prev)} // Toggle edit mode
+      style={{ color: isEditingTitle ? '#1e90ff' : '#356B77', marginLeft: '8px' }}
+    >
+      <MdEdit size={24} />
+    </ActionIcon>
+  </div>
+</Group>
+
+
+
 
         {/* Exercise Cards */}
         <div style={{ marginTop: '1rem' }}>
@@ -82,16 +93,16 @@ function NewWorkoutPage() {
 
         {/* Add Exercise Button */}
         <ActionIcon
-          variant="filled"
-          size="lg"
-          style={{ backgroundColor: '#356B77', color: 'white', width: '30px', height: '30px', borderRadius: '50%', marginBottom: '20px' }}
+          size='xl'
+          variant="transparent"
+          style={{ color: '#356B77', marginBottom: '1rem' }}
           onClick={handleAddExercise}
         >
-          <MdAdd size={24} />
+          <MdAddCircleOutline size={50} />
         </ActionIcon>
 
         {/* Finish Workout */}
-        <Group position="center" style={{ marginTop: '3rem' }}>
+        <Group position="center" style={{ marginTop: '2rem' }}>
           <Button
             disabled={!exercises.length}
             variant="filled"
