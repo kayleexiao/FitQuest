@@ -1,26 +1,22 @@
 import React from 'react';
 
 const Calendar = ({ selectedMonth, selectedYear, selectedDay, onDayClick }) => {
-  const currentDate = new Date(); // Reference today's date
+  const currentDate = new Date();
   const monthIndex = new Date(`${selectedMonth} 1, ${selectedYear}`).getMonth();
-  const daysInMonth = new Date(selectedYear, monthIndex + 1, 0).getDate(); // Days in selected month
-  const firstDayIndex = new Date(selectedYear, monthIndex, 1).getDay(); // Day of the week (0 = Sunday)
+  const daysInMonth = new Date(selectedYear, monthIndex + 1, 0).getDate();
+  const firstDayIndex = new Date(selectedYear, monthIndex, 1).getDay();
 
-  // Generate days array for the current month
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-  // Add empty slots for days before the first day of the month
   const emptySlots = Array.from({ length: firstDayIndex }, (_, i) => null);
 
-  // Combine empty slots and days
   const calendarDays = [...emptySlots, ...days];
 
   while (calendarDays.length < 42) {
-    calendarDays.push(null); // Append empty slots to make the total 42
+    calendarDays.push(null);
   }
 
-  // Calculate the number of rows (weeks) needed for the calendar
-  const rows = Math.ceil(calendarDays.length / 7); // Divide by 7 to get the number of weeks
+  const rows = Math.ceil(calendarDays.length / 7);
 
   return (
     <div style={{
@@ -29,13 +25,14 @@ const Calendar = ({ selectedMonth, selectedYear, selectedDay, onDayClick }) => {
       gridTemplateRows: `repeat(${rows}, 1fr)`,
       borderStyle: 'solid',
       borderColor: 'rgba(53,107,119,0.71)',
-      borderWidth: '10px',
-      gap: '10px',
-      padding: '10px',
+      borderWidth: 'min(2.31vw, 1.07vh)',
+      gap: 'min(10.32vw, 1.07vh)',
+      padding: 'min(10.32vw, 1.07vh)',
       backgroundColor: 'white',
       borderRadius: '20px',
       height: '40vh',
-      width: '80vw'
+      width: '80vw',
+      minWidth: '240px'
     }}>
       {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
         <div
@@ -44,6 +41,7 @@ const Calendar = ({ selectedMonth, selectedYear, selectedDay, onDayClick }) => {
             fontWeight: 'bold',
             textAlign: 'center',
             color: day ? '#356B77' : 'transparent',
+            fontSize: 'min(3.72vw, 1.72vh)'
           }}
         >
           {day}
@@ -59,12 +57,14 @@ const Calendar = ({ selectedMonth, selectedYear, selectedDay, onDayClick }) => {
             key={index}
             onClick={() => day && onDayClick(day)}
             style={{
-              padding: '8px',
+              paddingTop: '0.86vh',
+              paddingBottom: '0.86vh',
               backgroundColor: day ? (isSelected ? '#356B77' : '#ffffff') : 'transparent',
               textAlign: 'center',
               color: day ? (isToday ? 'red' : isSelected ? 'white' : '#356B77') : 'transparent',
-              borderRadius: '30px',
+              borderRadius: '50px',
               cursor: day ? 'pointer' : 'default',
+              fontSize: 'min(3.72vw, 1.72vh)'
             }}
           >
             {day || ''}
