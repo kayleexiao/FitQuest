@@ -141,35 +141,69 @@ function LoginPage() {
           marginTop: '25vh',
         }}
       >
-        <label
-            htmlFor="email"
-            style={{
+        {!isLogin && (
+          <>
+            <label
+              htmlFor="username"
+              style={{
                 fontSize: '1.41vh',
                 width: '68.7vw',
                 textAlign: 'left',
-                color: errors.email === 'Email already used' || errors.email === 'Invalid Login' ? 'red' : 'grey',
-            }}
+                color: 'grey',
+              }}
             >
-            Email {errors.email === 'Email already used' && '(Email already used)'}
-            {errors.email === 'Invalid Login' && '(Invalid Login)'}
+              First Name
             </label>
             <input
-            type="email"
-            id="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            required
-            style={{
+              type="text"
+              id="username"
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your first name"
+              required
+              style={{
                 height: '5vh',
                 width: '68.7vw',
                 marginBottom: '1vh',
                 fontSize: '1.88vh',
-                border: errors.email ? '2px solid red' : '1px solid #ccc',
+                border: errors.username ? '2px solid red' : '1px solid #ccc',
                 borderRadius: '5px',
                 paddingLeft: '15px',
-            }}
+              }}
+            />
+          </>
+        )}
+
+        <label
+          htmlFor="email"
+          style={{
+            fontSize: '1.41vh',
+            width: '68.7vw',
+            textAlign: 'left',
+            color: errors.email === 'Email already used' || errors.email === 'Invalid Login' ? 'red' : 'grey',
+          }}
+        >
+          Email {errors.email === 'Email already used' && '(Email already used)'}
+          {errors.email === 'Invalid Login' && '(Invalid Login)'}
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email"
+          required
+          style={{
+            height: '5vh',
+            width: '68.7vw',
+            marginBottom: '1vh',
+            fontSize: '1.88vh',
+            border: errors.email ? '2px solid red' : '1px solid #ccc',
+            borderRadius: '5px',
+            paddingLeft: '15px',
+          }}
         />
 
         <label
@@ -261,36 +295,6 @@ function LoginPage() {
                     {passwordVisible ? <MdOutlineVisibility size={'min(2.15vh, 4.65vw)'}/> : <MdOutlineVisibilityOff size={'min(2.15vh, 4.65vw)'}/>}
                 </div>
             </div>
-
-            <label
-              htmlFor="username"
-              style={{
-                fontSize: '1.41vh',
-                width: '68.7vw',
-                textAlign: 'left',
-                color: 'grey',
-              }}
-            >
-              First Name
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your first name"
-              required
-              style={{
-                height: '5vh',
-                width: '68.7vw',
-                marginBottom: '1vh',
-                fontSize: '1.88vh',
-                border: errors.username ? '2px solid red' : '1px solid #ccc',
-                borderRadius: '5px',
-                paddingLeft: '15px',
-              }}
-            />
           </>
         )}
 
