@@ -1,7 +1,5 @@
 import { Container, Group, UnstyledButton, Text } from '@mantine/core';
-import { useState } from 'react';
 import { FaRegClock } from "react-icons/fa6";
-import { IoIosArrowDropright } from "react-icons/io";
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 
@@ -22,15 +20,6 @@ function HistoryPage() {
       ]
     }
   ];
-
-  const [expandedItems, setExpandedItems] = useState({});
-
-  const toggleItem = (id) => {
-    setExpandedItems((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
 
   return (
     <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
@@ -85,54 +74,35 @@ function HistoryPage() {
               </div>
               
               {/* Items for this date */}
-              {dateGroup.items.map((item, index) => {
-                const itemId = `${dateGroup.date}-${index}`;
-                return (
-                  <div key={itemId}>
-                    <UnstyledButton
-                      onClick={() => toggleItem(itemId)}
-                      style={{
-                        width: '100%',
-                        backgroundColor: '#879DA1',
-                        borderRadius: expandedItems[itemId] ? '25px 25px 0 0' : 25,
-                        padding: '15px 12px',
-                        marginBottom: expandedItems[itemId] ? 0 : 10,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <span style={{ color: 'white', fontWeight: 500 }}>{item.title}</span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ color: 'white', fontSize: '0.8em' }}>
-                          {item.time}
-                        </span>
-                        <IoIosArrowDropright
-                          size={20}
-                          color="white"
-                          style={{
-                            transform: expandedItems[itemId] ? 'rotate(90deg)' : 'none',
-                            transition: 'transform 0.3s ease'
-                          }}
-                        />
-                      </div>
-                    </UnstyledButton>
-                    
-                    {expandedItems[itemId] && (
-                      <div style={{
-                        backgroundColor: '#9AB7BF',
-                        borderRadius: '0 0 25px 25px',
-                        padding: '15px 12px',
-                        marginBottom: 10,
-                        color: 'white',
-                        width: '100%'
-                      }}>
-                        <p>Workout details can go here...</p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {dateGroup.items.map((item, index) => (
+                <UnstyledButton
+                  key={`${dateGroup.date}-${index}`}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#879DA1',
+                    borderRadius: 25,
+                    padding: '15px 12px',
+                    marginBottom: 10,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <span style={{ color: 'white', fontWeight: 500 }}>{item.title}</span>
+                  <button
+                    style={{
+                      backgroundColor: '#356B77',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 15,
+                      padding: '5px 10px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    See Details
+                  </button>
+                </UnstyledButton>
+              ))}
             </div>
           ))}
         </Container>
