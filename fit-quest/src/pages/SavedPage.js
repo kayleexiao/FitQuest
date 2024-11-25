@@ -564,7 +564,7 @@ function SavedPage() {
                 onClick={() => toggleItem(index)}
                 style={{
                   width: '100%',
-                  backgroundColor: '#9AB7BF',
+                  backgroundColor: '#879DA1',
                   borderRadius: expandedItems[index] ? '25px 25px 0 0' : 25,
                   padding: '15px 12px',
                   marginBottom: expandedItems[index] ? 0 : 10,
