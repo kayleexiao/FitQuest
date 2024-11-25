@@ -543,7 +543,7 @@ function SavedPage() {
         fluid
         style={{ 
           padding: '0',
-          marginTop: '140px',
+          marginTop: '160px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
