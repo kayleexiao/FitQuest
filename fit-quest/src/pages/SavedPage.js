@@ -433,7 +433,7 @@ function SavedPage() {
               marginRight: '10px',
               transition: 'all 0.3s ease',
             }}><i>Saved</i></span>
-            <FaBookmark 
+            <FaBookmark
               size={isScrolled ? 20 : 30} 
               style={{ 
                 color: '#356B77', 
