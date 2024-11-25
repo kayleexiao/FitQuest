@@ -12,7 +12,7 @@ function CalendarPage() {
 
   const currentMonthIndex = new Date().getMonth();
   const currentYear = new Date().getFullYear();
-  const currentDay = new Date().getDate(); // Get the current day of the month, not the week
+  const currentDay = new Date().getDate();
 
   const [selectedMonth, setSelectedMonth] = useState(
     new Date(currentYear, currentMonthIndex).toLocaleString('default', { month: 'long' })
@@ -105,13 +105,13 @@ function CalendarPage() {
           top: '87.5%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          height: '30px',
+          height: '3.21vh',
           width: '80%',
         }}>
-        <button onClick={addItem} style={{ marginRight: '10px', padding: '10px', borderRadius: '5px', backgroundColor: '#356B77', color: 'white', border: 'none', cursor: 'pointer', fontSize: '10px' }}>
+        <button onClick={addItem} style={{ marginRight: '2.31vw', padding: 'min(2.31vw, 1.07vh)', borderRadius: '5px', backgroundColor: '#356B77', color: 'white', border: 'none', cursor: 'pointer', fontSize: 'min(2.31vw, 1.07vh)' }}>
           Add Workout (Temp)
         </button>
-        <button onClick={removeLastItem} style={{ padding: '10px', borderRadius: '5px', backgroundColor: '#E74C3C', color: 'white', border: 'none', cursor: 'pointer', fontSize: '10px' }}>
+        <button onClick={removeLastItem} style={{ padding: 'min(2.31vw, 1.07vh)', borderRadius: '5px', backgroundColor: '#E74C3C', color: 'white', border: 'none', cursor: 'pointer', fontSize: 'min(2.31vw, 1.07vh)' }}>
           Remove Last Workout (Temp)
         </button>
       </div>
