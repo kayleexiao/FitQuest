@@ -427,14 +427,16 @@ function SavedPage() {
             marginLeft: '2px'
           }}>
             <span style={{ 
-              fontSize: isScrolled ? '24px' : '36px', 
+              fontSize: '3.86vh',
               color: '#356B77', 
-              fontWeight: 650, 
+              fontWeight: 650,
+              letterSpacing: '0.1rem',
               marginRight: '10px',
+              fontStyle: 'italic',
               transition: 'all 0.3s ease',
-            }}><i>Saved</i></span>
+            }}>Saved</span>
             <FaBookmark 
-              size={isScrolled ? 20 : 30} 
+              size={20}
               style={{ 
                 color: '#356B77', 
                 marginRight: '30px',
