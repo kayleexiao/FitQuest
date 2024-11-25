@@ -341,8 +341,60 @@ function SavedPage() {
   };
 
   const handleRecoverWorkout = (workout, index) => {
-    // Add workout back to main list
-    const updatedWorkouts = [...workouts, workout];
+    // Create updated workouts array
+    let updatedWorkouts = [...workouts];
+    
+    // Determine position based on current sort order
+    switch(selectedSort) {
+      case 'Recent (Latest)':
+        // Find position where lastDoneDate is just older
+        const insertIndex = updatedWorkouts.findIndex(w => 
+          new Date(w.lastDoneDate) < new Date(workout.lastDoneDate)
+        );
+        if (insertIndex === -1) {
+          updatedWorkouts.push(workout);
+        } else {
+          updatedWorkouts.splice(insertIndex, 0, workout);
+        }
+        break;
+        
+      case 'Recent (Oldest)':
+        const oldestIndex = updatedWorkouts.findIndex(w => 
+          new Date(w.lastDoneDate) > new Date(workout.lastDoneDate)
+        );
+        if (oldestIndex === -1) {
+          updatedWorkouts.push(workout);
+        } else {
+          updatedWorkouts.splice(oldestIndex, 0, workout);
+        }
+        break;
+        
+      case 'Name (A to Z)':
+        const alphaIndex = updatedWorkouts.findIndex(w => 
+          w.title.localeCompare(workout.title) > 0
+        );
+        if (alphaIndex === -1) {
+          updatedWorkouts.push(workout);
+        } else {
+          updatedWorkouts.splice(alphaIndex, 0, workout);
+        }
+        break;
+        
+      case 'Name (Z to A)':
+        const reverseAlphaIndex = updatedWorkouts.findIndex(w => 
+          w.title.localeCompare(workout.title) < 0
+        );
+        if (reverseAlphaIndex === -1) {
+          updatedWorkouts.push(workout);
+        } else {
+          updatedWorkouts.splice(reverseAlphaIndex, 0, workout);
+        }
+        break;
+        
+      default:
+        updatedWorkouts.push(workout);
+    }
+    
     setWorkouts(updatedWorkouts);
     
     // Remove from deleted workouts
