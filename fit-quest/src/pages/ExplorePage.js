@@ -62,30 +62,32 @@ function ExplorePage() {
       <Container style={{ paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
         <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem', marginBottom: '1rem', gap: 0 }}>
         {/* Greeting Section */}
-          <Text
-            style={{
-              textAlign: 'left',
-              fontSize: '3.86vh',
-              color: '#356B77',
-              fontWeight: 650,
-              margin: 0,
-              padding: 0,
-            }}
-          >
-            <i>Hello User!</i>
-          </Text>
-          <Text
-            style={{
-              color: '#356B77',
-              fontSize: '18px',
-              fontWeight: 500,
-              textAlign: 'left',
-              marginBottom: '1rem',
-              padding: 0,
-            }}
-          >
-            Today is {currentDate}.
-          </Text>
+          <Group align="center" style={{ gap: '10px' }}>
+            <Text
+              style={{
+                textAlign: 'left',
+                fontSize: '3.86vh',
+                color: '#356B77',
+                fontWeight: 650,
+                margin: 0,
+                padding: 0,
+              }}
+            >
+              <i>Hello User!</i>
+            </Text>
+            <Text
+              style={{
+                color: '#356B77',
+                fontSize: '18px',
+                fontWeight: 500,
+                textAlign: 'left',
+                padding: 0,
+                marginTop: '5px',
+              }}
+            >
+              Today is {currentDate}.
+            </Text>
+          </Group>
         </Group>
 
           {/* Training Selection Tabs */}

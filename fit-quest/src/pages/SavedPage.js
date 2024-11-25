@@ -341,8 +341,60 @@ function SavedPage() {
   };
 
   const handleRecoverWorkout = (workout, index) => {
-    // Add workout back to main list
-    const updatedWorkouts = [...workouts, workout];
+    // Create updated workouts array
+    let updatedWorkouts = [...workouts];
+    
+    // Determine position based on current sort order
+    switch(selectedSort) {
+      case 'Recent (Latest)':
+        // Find position where lastDoneDate is just older
+        const insertIndex = updatedWorkouts.findIndex(w => 
+          new Date(w.lastDoneDate) < new Date(workout.lastDoneDate)
+        );
+        if (insertIndex === -1) {
+          updatedWorkouts.push(workout);
+        } else {
+          updatedWorkouts.splice(insertIndex, 0, workout);
+        }
+        break;
+        
+      case 'Recent (Oldest)':
+        const oldestIndex = updatedWorkouts.findIndex(w => 
+          new Date(w.lastDoneDate) > new Date(workout.lastDoneDate)
+        );
+        if (oldestIndex === -1) {
+          updatedWorkouts.push(workout);
+        } else {
+          updatedWorkouts.splice(oldestIndex, 0, workout);
+        }
+        break;
+        
+      case 'Name (A to Z)':
+        const alphaIndex = updatedWorkouts.findIndex(w => 
+          w.title.localeCompare(workout.title) > 0
+        );
+        if (alphaIndex === -1) {
+          updatedWorkouts.push(workout);
+        } else {
+          updatedWorkouts.splice(alphaIndex, 0, workout);
+        }
+        break;
+        
+      case 'Name (Z to A)':
+        const reverseAlphaIndex = updatedWorkouts.findIndex(w => 
+          w.title.localeCompare(workout.title) < 0
+        );
+        if (reverseAlphaIndex === -1) {
+          updatedWorkouts.push(workout);
+        } else {
+          updatedWorkouts.splice(reverseAlphaIndex, 0, workout);
+        }
+        break;
+        
+      default:
+        updatedWorkouts.push(workout);
+    }
+    
     setWorkouts(updatedWorkouts);
     
     // Remove from deleted workouts
@@ -433,7 +485,7 @@ function SavedPage() {
               marginRight: '10px',
               transition: 'all 0.3s ease',
             }}><i>Saved</i></span>
-            <FaBookmark 
+            <FaBookmark
               size={isScrolled ? 20 : 30} 
               style={{ 
                 color: '#356B77', 
@@ -543,7 +595,7 @@ function SavedPage() {
         fluid
         style={{ 
           padding: '0',
-          marginTop: '140px',
+          marginTop: '160px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -564,7 +616,7 @@ function SavedPage() {
                 onClick={() => toggleItem(index)}
                 style={{
                   width: '100%',
-                  backgroundColor: '#9AB7BF',
+                  backgroundColor: '#879DA1',
                   borderRadius: expandedItems[index] ? '25px 25px 0 0' : 25,
                   padding: '15px 12px',
                   marginBottom: expandedItems[index] ? 0 : 10,
