@@ -1,13 +1,11 @@
-import Navbar from '../components/NavBar';
-import Statusbar from '../components/StatusBar';
-import { Container, Stack } from '@mantine/core';
-import { IoIosArrowDropright } from "react-icons/io";
-import { UnstyledButton } from '@mantine/core';
+import { Container, Group, UnstyledButton, Text } from '@mantine/core';
 import { useState } from 'react';
 import { FaRegClock } from "react-icons/fa6";
+import { IoIosArrowDropright } from "react-icons/io";
+import Navbar from '../components/NavBar';
+import Statusbar from '../components/StatusBar';
 
 function HistoryPage() {
-  // Updated mock data structure
   const historyEntries = [
     { 
       date: '01/15/2024',
@@ -26,62 +24,46 @@ function HistoryPage() {
   ];
 
   const [expandedItems, setExpandedItems] = useState({});
-  const isScrolled = false;
 
   const toggleItem = (id) => {
-    setExpandedItems(prev => ({
+    setExpandedItems((prev) => ({
       ...prev,
-      [id]: !prev[id]
+      [id]: !prev[id],
     }));
   };
 
   return (
-    <Container>
+    <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
+      {/* Fixed Status Bar */}
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1, maxWidth: '100%', margin: 'auto', backgroundColor: '#fff' }}>
+        <Statusbar />
+      </div>
       <Navbar />
-      <Stack spacing="md" mt="xl">
-        <Container
-          fluid
-          style={{
-            backgroundColor: 'rgba(0,0,0,0)',
-            display: 'flex',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            height: isScrolled ? '40px' : '60px',
-            transition: 'all 0.3s ease',
-            padding: '0',
-          }}
-        >
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'flex-start',
-            marginLeft: '10px'
-          }}>
-            <span style={{ 
-              fontSize: isScrolled ? '24px' : '36px', 
-              color: '#356B77', 
-              fontWeight: 650, 
-              marginRight: '10px',
-              transition: 'all 0.3s ease',
-            }}><i>History</i></span>
-            <FaRegClock 
-              size={isScrolled ? 20 : 30} 
-              style={{ 
-                color: '#356B77', 
-                marginRight: '30px',
-                transition: 'all 0.3s ease',
-              }} 
-            />
-          </div>
-        </Container>
+      {/* Title Section */}
+      <Container style={{ paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
+        <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem', marginBottom: '1.5rem' }}>
+          {/* Greeting Section */}
+            <Text
+              style={{
+                textAlign: 'left',
+                fontSize: '3.86vh',
+                color: '#356B77',
+                fontWeight: 650,
+                margin: 0,
+                padding: 0,
+              }}
+            >
+              <i>History</i>
+            </Text>
+            <FaRegClock size={'3.3rem'} style={{ paddingLeft: '1rem', color: '#356B77' }} />
+          </Group>
+      </Container>
         
         {/* Scrollable List */}
         <Container 
           fluid
           style={{ 
-            padding: '0',
-            marginTop: '80px',
-            marginBottom: '80px',
+            padding: '10px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -90,10 +72,10 @@ function HistoryPage() {
           }}
         >
           {historyEntries.map((dateGroup) => (
-            <div key={dateGroup.date} style={{ width: '99%', maxWidth: '99%', margin: '0 auto' }}>
+            <div key={dateGroup.date} style={{ width: '100%', margin: '0 auto' }}>
               {/* Date Header */}
               <div style={{ 
-                padding: '10px 12px', 
+                padding: '0px 12px', 
                 color: '#356B77', 
                 fontWeight: 600,
                 textAlign: 'left',
@@ -111,7 +93,7 @@ function HistoryPage() {
                       onClick={() => toggleItem(itemId)}
                       style={{
                         width: '100%',
-                        backgroundColor: '#9AB7BF',
+                        backgroundColor: '#879DA1',
                         borderRadius: expandedItems[itemId] ? '25px 25px 0 0' : 25,
                         padding: '15px 12px',
                         marginBottom: expandedItems[itemId] ? 0 : 10,
@@ -125,8 +107,8 @@ function HistoryPage() {
                         <span style={{ color: 'white', fontSize: '0.8em' }}>
                           {item.time}
                         </span>
-                        <IoIosArrowDropright 
-                          size={20} 
+                        <IoIosArrowDropright
+                          size={20}
                           color="white"
                           style={{
                             transform: expandedItems[itemId] ? 'rotate(90deg)' : 'none',
@@ -154,9 +136,8 @@ function HistoryPage() {
             </div>
           ))}
         </Container>
-      </Stack>
       <Statusbar />
-    </Container>
+      </div>
   );
 }
 

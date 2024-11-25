@@ -59,7 +59,7 @@ function ExplorePage() {
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1, maxWidth: '100%', margin: 'auto', backgroundColor: '#fff' }}>
         <Statusbar />
       </div>
-      <Container style={{ paddingBottom: '90px', paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
+      <Container style={{ paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
         <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem', marginBottom: '1rem', gap: 0 }}>
         {/* Greeting Section */}
           <Text
