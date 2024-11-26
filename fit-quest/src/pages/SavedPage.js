@@ -6,6 +6,7 @@ import { IoSearchOutline, IoFilterOutline } from 'react-icons/io5';
 import { FaBookmark, FaTrashRestore } from 'react-icons/fa';
 import { BsThreeDots } from "react-icons/bs";
 import { GoHistory } from "react-icons/go";
+import { useNavigate } from 'react-router-dom';
 
 function SavedPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -29,6 +30,7 @@ function SavedPage() {
   });
   const [deletedWorkouts, setDeletedWorkouts] = useState([]);
   const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -229,14 +231,36 @@ function SavedPage() {
 
   const handleStartWorkout = (e, index) => {
     e.stopPropagation();
+    
+    // Update last done date
     const updatedWorkouts = [...workouts];
+    const selectedWorkout = updatedWorkouts[index];
     updatedWorkouts[index] = {
-      ...updatedWorkouts[index],
-      lastDoneDate: getTodayDate()
+      ...selectedWorkout,
+      lastDoneDate: new Date().toISOString()
     };
     setWorkouts(updatedWorkouts);
     localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
-    // Add any additional logic for starting the workout
+    
+    // Prepare exercises in the correct format for NewWorkoutPage
+    const formattedExercises = selectedWorkout.exercises.map(exercise => ({
+      title: exercise,
+      type: 'weight', // You might want to store exercise types in your saved workouts
+      sets: []
+    }));
+
+    // Store in localStorage for NewWorkoutPage
+    localStorage.setItem('currentWorkout', JSON.stringify(formattedExercises));
+    
+    // Navigate to NewWorkout page with the workout data
+    navigate('/new-workout', { 
+      state: { 
+        workoutTemplate: {
+          title: selectedWorkout.title,
+          exercises: formattedExercises
+        }
+      }
+    });
   };
 
   const handleSortSelection = (option) => {
@@ -341,60 +365,8 @@ function SavedPage() {
   };
 
   const handleRecoverWorkout = (workout, index) => {
-    // Create updated workouts array
-    let updatedWorkouts = [...workouts];
-    
-    // Determine position based on current sort order
-    switch(selectedSort) {
-      case 'Recent (Latest)':
-        // Find position where lastDoneDate is just older
-        const insertIndex = updatedWorkouts.findIndex(w => 
-          new Date(w.lastDoneDate) < new Date(workout.lastDoneDate)
-        );
-        if (insertIndex === -1) {
-          updatedWorkouts.push(workout);
-        } else {
-          updatedWorkouts.splice(insertIndex, 0, workout);
-        }
-        break;
-        
-      case 'Recent (Oldest)':
-        const oldestIndex = updatedWorkouts.findIndex(w => 
-          new Date(w.lastDoneDate) > new Date(workout.lastDoneDate)
-        );
-        if (oldestIndex === -1) {
-          updatedWorkouts.push(workout);
-        } else {
-          updatedWorkouts.splice(oldestIndex, 0, workout);
-        }
-        break;
-        
-      case 'Name (A to Z)':
-        const alphaIndex = updatedWorkouts.findIndex(w => 
-          w.title.localeCompare(workout.title) > 0
-        );
-        if (alphaIndex === -1) {
-          updatedWorkouts.push(workout);
-        } else {
-          updatedWorkouts.splice(alphaIndex, 0, workout);
-        }
-        break;
-        
-      case 'Name (Z to A)':
-        const reverseAlphaIndex = updatedWorkouts.findIndex(w => 
-          w.title.localeCompare(workout.title) < 0
-        );
-        if (reverseAlphaIndex === -1) {
-          updatedWorkouts.push(workout);
-        } else {
-          updatedWorkouts.splice(reverseAlphaIndex, 0, workout);
-        }
-        break;
-        
-      default:
-        updatedWorkouts.push(workout);
-    }
-    
+    // Add workout back to main list
+    const updatedWorkouts = [...workouts, workout];
     setWorkouts(updatedWorkouts);
     
     // Remove from deleted workouts
@@ -618,7 +590,7 @@ function SavedPage() {
                 onClick={() => toggleItem(index)}
                 style={{
                   width: '100%',
-                  backgroundColor: '#879DA1',
+                  backgroundColor: '#9AB7BF',
                   borderRadius: expandedItems[index] ? '25px 25px 0 0' : 25,
                   padding: '15px 12px',
                   marginBottom: expandedItems[index] ? 0 : 10,
