@@ -24,8 +24,8 @@ const MonthMenu = ({ onMonthSelect }) => {  // Accept the callback as a prop
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <button onClick={toggleDropdown} style={{
-        padding: '10px 20px',
-        borderRadius: '25px',
+        padding: '2.15vh 4.63vw',
+        borderRadius: 'max(5.81vw, 2.68vh)',
         border: 'none',
         cursor: 'pointer',
         boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
@@ -36,13 +36,13 @@ const MonthMenu = ({ onMonthSelect }) => {  // Accept the callback as a prop
         justifyContent: 'space-between',
         alignItems: 'center',
         color: 'white',
-        fontSize: '1.72vh'
+        fontSize: 'min(1.72vh, 3.72vw)'
       }}>
         {selectedMonth}
         <IoIosArrowDropdown 
           style={{
-            marginLeft: '10px',
-            fontSize: '2.15vh',
+            marginLeft: '2.31vw',
+            fontSize: 'min(2.15vh, 4.65vw)',
             transition: 'transform 0.3s ease',
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
           }} 
@@ -66,13 +66,13 @@ const MonthMenu = ({ onMonthSelect }) => {  // Accept the callback as a prop
               onClick={() => handleMonthSelect(month)}
               style={{
                 position: 'relative',
-                padding: '8px 12px 8px 20px',
+                padding: '0.86vh 2.78vw 0.86vh 4.63vw',
                 cursor: 'pointer',
                 borderRadius: '4px',
                 color: '#356B77',
                 display: 'flex',
                 alignItems: 'center',
-                fontSize: '1.72vh',
+                fontSize: 'min(1.72vh, 3.72vw)',
                 backgroundColor: month === selectedMonth ? 'rgba(0,0,0,0.05)' : 'transparent'
               }}
             >

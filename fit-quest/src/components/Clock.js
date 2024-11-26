@@ -18,7 +18,7 @@ const Clock = () => {
   });
 
   return (
-    <div style={{ fontSize: '15px', fontWeight: 'bold', color: 'black', textAlign: 'center' }}>
+    <div style={{ fontSize: 'min(15px, 1.61vh)', fontWeight: 'bold', color: 'black', textAlign: 'center' }}>
       {formattedTime}
     </div>
   );

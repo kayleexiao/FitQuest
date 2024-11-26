@@ -29,7 +29,7 @@ const Calendar = ({ selectedMonth, selectedYear, selectedDay, onDayClick }) => {
       gap: 'min(10.32vw, 1.07vh)',
       padding: 'min(10.32vw, 1.07vh)',
       backgroundColor: 'white',
-      borderRadius: '20px',
+      borderRadius: 'max(4.65vw, 2.15vh)',
       height: '40vh',
       width: '80vw',
       minWidth: '240px'

@@ -40,34 +40,34 @@ const BatteryIcon = () => {
   // Select the appropriate icon based on battery level and charging state
   const getBatteryIcon = () => {
     if (isCharging) {
-      return <IoBatteryChargingOutline size={20} />;
+      return <IoBatteryChargingOutline size={'2.15vh'} />;
     } else if (batteryLevel > 0.9) {
-      return <IoBatteryFullOutline size={20} />;
+      return <IoBatteryFullOutline size={'2.15vh'} />;
     } else if (batteryLevel > 0.8) {
-        return <IoBattery90Outline style={{width: '20px', height: '20px'}} />;
+        return <IoBattery90Outline style={{width: '2.15vh', height: '2.15vh'}} />;
     } else if (batteryLevel > 0.7) {
-        return <IoBattery80Outline style={{width: '20px', height: '20px'}} />;
+        return <IoBattery80Outline style={{width: '2.15vh', height: '2.15vh'}} />;
     } else if (batteryLevel > 0.6) {
-        return <IoBattery70Outline style={{width: '20px', height: '20px'}} />;
+        return <IoBattery70Outline style={{width: '2.15vh', height: '2.15vh'}} />;
     }  else if (batteryLevel > 0.5) {
-        return <IoBattery60Outline style={{width: '20px', height: '20px'}} />;
+        return <IoBattery60Outline style={{width: '2.15vh', height: '2.15vh'}} />;
     }  else if (batteryLevel > 0.4) {
         return <IoBatteryHalfOutline size={20} />;
     }  else if (batteryLevel > 0.3) {
-        return <IoBattery40Outline style={{width: '20px', height: '20px'}} />;
+        return <IoBattery40Outline style={{width: '2.15vh', height: '2.15vh'}} />;
     }  else if (batteryLevel > 0.2) {
-        return <IoBattery30Outline style={{width: '20px', height: '20px'}} />;
+        return <IoBattery30Outline style={{width: '2.15vh', height: '2.15vh'}} />;
     } else if (batteryLevel > 0.1) {
-        return <IoBattery20Outline style={{width: '20px', height: '20px'}} />;
+        return <IoBattery20Outline style={{width: '2.15vh', height: '2.15vh'}} />;
     } else {
-        return <IoBattery10Outline style={{width: '20px', height: '20px'}} />;
+        return <IoBattery10Outline style={{width: '2.15vh', height: '2.15vh'}} />;
     }
   };
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {getBatteryIcon()}
-      <span style={{ marginLeft: '5px', fontSize: '15px', fontWeight: 'bold'}}>{Math.round(batteryLevel * 100)}%</span>
+      <span style={{ marginLeft: 'min(5px,1.16vw)', fontSize: '1.61vh', fontWeight: 'bold'}}>{Math.round(batteryLevel * 100)}%</span>
     </div>
   );
 };

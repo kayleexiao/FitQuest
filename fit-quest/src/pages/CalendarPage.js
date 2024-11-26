@@ -88,7 +88,7 @@ function CalendarPage() {
       <div style={{
         position: 'fixed',
         flexDirection: 'column',
-        top: '75%',
+        top: '75vh',
         left: '50%',
         transform: 'translate(-50%, -50%)',
         height: '15vh',
@@ -102,7 +102,7 @@ function CalendarPage() {
       <div style={{
           position: 'fixed',
           flexDirection: 'column',
-          top: '87.5%',
+          marginTop: '84vh',
           left: '50%',
           transform: 'translate(-50%, -50%)',
           height: '3.21vh',
@@ -116,7 +116,7 @@ function CalendarPage() {
         </button>
       </div>
 
-      <div style={{ marginTop: '17.17vh', display: 'flex', justifyContent: 'center', position: 'fixed', left: '50%', transform: 'translate(-50%, 0%)' }}>
+      <div style={{ marginTop: '18vh', display: 'flex', justifyContent: 'center', position: 'fixed', left: '50%', transform: 'translate(-50%, 0%)' }}>
         <Calendar 
           selectedMonth={selectedMonth} 
           selectedYear={selectedYear}
