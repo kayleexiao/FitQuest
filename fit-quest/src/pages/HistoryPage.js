@@ -52,7 +52,7 @@ function HistoryPage() {
         <Container 
           fluid
           style={{ 
-            padding: '10px',
+            padding: '20px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -61,14 +61,19 @@ function HistoryPage() {
           }}
         >
           {historyEntries.map((dateGroup) => (
-            <div key={dateGroup.date} style={{ width: '100%', margin: '0 auto' }}>
+            <div key={dateGroup.date} style={{ 
+              width: '100%', 
+              margin: '0 auto',
+              marginBottom: '20px'
+            }}>
               {/* Date Header */}
               <div style={{ 
                 padding: '0px 12px', 
                 color: '#356B77', 
                 fontWeight: 600,
                 textAlign: 'left',
-                width: '100%'
+                width: '100%',
+                marginBottom: '15px'
               }}>
                 {dateGroup.date}
               </div>
@@ -82,7 +87,7 @@ function HistoryPage() {
                     backgroundColor: '#879DA1',
                     borderRadius: 25,
                     padding: '15px 12px',
-                    marginBottom: 10,
+                    marginBottom: '15px',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
