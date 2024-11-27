@@ -6,6 +6,7 @@ import { IoSearchOutline, IoFilterOutline } from 'react-icons/io5';
 import { FaBookmark, FaTrashRestore } from 'react-icons/fa';
 import { BsThreeDots } from "react-icons/bs";
 import { GoHistory } from "react-icons/go";
+import { useNavigate } from 'react-router-dom';
 
 function SavedPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -29,6 +30,11 @@ function SavedPage() {
   });
   const [deletedWorkouts, setDeletedWorkouts] = useState([]);
   const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const [workoutReplaceModal, setWorkoutReplaceModal] = useState({
+    isOpen: false,
+    workoutIndex: null
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -229,14 +235,50 @@ function SavedPage() {
 
   const handleStartWorkout = (e, index) => {
     e.stopPropagation();
+    
+    // Check if there's an active workout
+    const currentWorkout = localStorage.getItem('currentWorkout');
+    if (currentWorkout) {
+      setWorkoutReplaceModal({
+        isOpen: true,
+        workoutIndex: index
+      });
+      return;
+    }
+
+    startNewWorkout(index);
+  };
+
+  const startNewWorkout = (index) => {
     const updatedWorkouts = [...workouts];
+    const selectedWorkout = updatedWorkouts[index];
     updatedWorkouts[index] = {
-      ...updatedWorkouts[index],
-      lastDoneDate: getTodayDate()
+      ...selectedWorkout,
+      lastDoneDate: new Date().toLocaleDateString('en-US', {
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit'
+      })
     };
     setWorkouts(updatedWorkouts);
     localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
-    // Add any additional logic for starting the workout
+    
+    const formattedExercises = selectedWorkout.exercises.map(exercise => ({
+      title: exercise,
+      type: 'weight',
+      sets: []
+    }));
+
+    localStorage.setItem('currentWorkout', JSON.stringify(formattedExercises));
+    
+    navigate('/new-workout', { 
+      state: { 
+        workoutTemplate: {
+          title: selectedWorkout.title,
+          exercises: formattedExercises
+        }
+      }
+    });
   };
 
   const handleSortSelection = (option) => {
@@ -341,60 +383,8 @@ function SavedPage() {
   };
 
   const handleRecoverWorkout = (workout, index) => {
-    // Create updated workouts array
-    let updatedWorkouts = [...workouts];
-    
-    // Determine position based on current sort order
-    switch(selectedSort) {
-      case 'Recent (Latest)':
-        // Find position where lastDoneDate is just older
-        const insertIndex = updatedWorkouts.findIndex(w => 
-          new Date(w.lastDoneDate) < new Date(workout.lastDoneDate)
-        );
-        if (insertIndex === -1) {
-          updatedWorkouts.push(workout);
-        } else {
-          updatedWorkouts.splice(insertIndex, 0, workout);
-        }
-        break;
-        
-      case 'Recent (Oldest)':
-        const oldestIndex = updatedWorkouts.findIndex(w => 
-          new Date(w.lastDoneDate) > new Date(workout.lastDoneDate)
-        );
-        if (oldestIndex === -1) {
-          updatedWorkouts.push(workout);
-        } else {
-          updatedWorkouts.splice(oldestIndex, 0, workout);
-        }
-        break;
-        
-      case 'Name (A to Z)':
-        const alphaIndex = updatedWorkouts.findIndex(w => 
-          w.title.localeCompare(workout.title) > 0
-        );
-        if (alphaIndex === -1) {
-          updatedWorkouts.push(workout);
-        } else {
-          updatedWorkouts.splice(alphaIndex, 0, workout);
-        }
-        break;
-        
-      case 'Name (Z to A)':
-        const reverseAlphaIndex = updatedWorkouts.findIndex(w => 
-          w.title.localeCompare(workout.title) < 0
-        );
-        if (reverseAlphaIndex === -1) {
-          updatedWorkouts.push(workout);
-        } else {
-          updatedWorkouts.splice(reverseAlphaIndex, 0, workout);
-        }
-        break;
-        
-      default:
-        updatedWorkouts.push(workout);
-    }
-    
+    // Add workout back to main list
+    const updatedWorkouts = [...workouts, workout];
     setWorkouts(updatedWorkouts);
     
     // Remove from deleted workouts
@@ -618,7 +608,7 @@ function SavedPage() {
                 onClick={() => toggleItem(index)}
                 style={{
                   width: '100%',
-                  backgroundColor: '#879DA1',
+                  backgroundColor: '#9AB7BF',
                   borderRadius: expandedItems[index] ? '25px 25px 0 0' : 25,
                   padding: '15px 12px',
                   marginBottom: expandedItems[index] ? 0 : 10,
@@ -1094,6 +1084,73 @@ function SavedPage() {
             No recently deleted workouts
           </div>
         )}
+      </Modal>
+
+      <Modal
+        opened={workoutReplaceModal.isOpen}
+        onClose={() => setWorkoutReplaceModal({ isOpen: false, workoutIndex: null })}
+        title="Active Workout Found"
+        size="sm"
+        styles={{
+          title: {
+            color: '#356B77',
+            fontWeight: 600,
+            fontSize: '20px'
+          },
+          modal: {
+            padding: '20px'
+          },
+          overlay: {
+            zIndex: 10001  // Higher z-index to ensure overlay appears above other elements
+          },
+          inner: {
+            zIndex: 10001  // Higher z-index to ensure modal appears above other elements
+          }
+        }}
+        centered
+      >
+        <div>
+          <p style={{ marginBottom: '20px' }}>
+            You have an active workout in progress. Would you like to replace it with this new workout?
+          </p>
+          <div style={{ 
+            display: 'flex', 
+            gap: '10px', 
+            justifyContent: 'flex-end' 
+          }}>
+            <button
+              onClick={() => setWorkoutReplaceModal({ isOpen: false, workoutIndex: null })}
+              style={{
+                backgroundColor: '#f5f5f5',
+                color: '#666',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '8px 15px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                startNewWorkout(workoutReplaceModal.workoutIndex);
+                setWorkoutReplaceModal({ isOpen: false, workoutIndex: null });
+              }}
+              style={{
+                backgroundColor: '#356B77',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '8px 15px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              Replace
+            </button>
+          </div>
+        </div>
       </Modal>
 
     </Container>
