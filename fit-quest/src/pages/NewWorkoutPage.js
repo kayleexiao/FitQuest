@@ -181,9 +181,6 @@ function NewWorkoutPage() {
   </div>
 </Group>
 
-
-
-
         {/* Exercise Cards */}
         <div style={{ marginTop: '1rem' }}>
           {exercises.length > 0 ? (
