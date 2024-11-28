@@ -3,6 +3,7 @@ import { Container, Text, Group, Card, Box } from '@mantine/core';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 import { MdBookmark, MdBookmarkBorder, MdStar, MdStarBorder } from 'react-icons/md';
+import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 
 
 function ExplorePage() {
@@ -52,6 +53,9 @@ function ExplorePage() {
       day: 'numeric',
       year: 'numeric',
     });
+
+  // At the top with other state declarations
+  const [bookmarkedWorkouts, setBookmarkedWorkouts] = useState({});
 
   return (
     <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
@@ -178,19 +182,40 @@ function ExplorePage() {
                   bottom: 0,
                   padding: '16px 20px',
                 }}>
-                  {/* Save Icon in Top Right */}
-                  <img 
-                    src="/Bookmark.png"
-                    alt="bookmark"
-                    style={{ 
-                      cursor: 'pointer',
-                      position: 'absolute',
-                      top: '12px',
-                      right: '20px',
-                      width: '24px',  // Adjust size as needed
-                      height: '24px', // Adjust size as needed
-    }}
-  />
+                  {/* Replace the bookmark icon with this interactive version */}
+                  {bookmarkedWorkouts[workout] ? (
+                    <FaBookmark 
+                      style={{ 
+                        cursor: 'pointer',
+                        position: 'absolute',
+                        top: '12px',
+                        right: '20px',
+                        width: '24px',
+                        height: '24px',
+                        color: 'white'
+                      }}
+                      onClick={() => setBookmarkedWorkouts(prev => ({
+                        ...prev,
+                        [workout]: false
+                      }))}
+                    />
+                  ) : (
+                    <FaRegBookmark 
+                      style={{ 
+                        cursor: 'pointer',
+                        position: 'absolute',
+                        top: '12px',
+                        right: '20px',
+                        width: '24px',
+                        height: '24px',
+                        color: 'white'
+                      }}
+                      onClick={() => setBookmarkedWorkouts(prev => ({
+                        ...prev,
+                        [workout]: true
+                      }))}
+                    />
+                  )}
 
                   {/* Workout Content */}
                   <div style={{ 
