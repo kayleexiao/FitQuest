@@ -178,6 +178,11 @@ function SavedPage() {
     setOpenMenu(null);
   };
 
+  const getTodayDate = () => {
+    const today = new Date();
+    return `${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getDate().toString().padStart(2, '0')}/${today.getFullYear().toString().slice(-2)}`;
+  };
+
   const handleSaveTitle = (index) => {
     if (editingText.trim()) {
       const updatedWorkouts = [...workouts];
@@ -200,8 +205,8 @@ function SavedPage() {
     
     if (!savedWorkouts || savedWorkouts.length === 0) {
       // If no saved workouts, use default templates
-      localStorage.setItem('workouts', JSON.stringify());
-      setWorkouts();
+      localStorage.setItem('workouts', JSON.stringify(defaultTemplates));
+      setWorkouts(defaultTemplates);
     } else {
       // Sort by lastDoneDate by default
       savedWorkouts.sort((a, b) => 
@@ -380,6 +385,58 @@ function SavedPage() {
   const handleRecoverWorkout = (workout, index) => {
     // Add workout back to main list
     const updatedWorkouts = [...workouts, workout];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     setWorkouts(updatedWorkouts);
     
     // Remove from deleted workouts
