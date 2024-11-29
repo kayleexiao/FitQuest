@@ -7,13 +7,12 @@ import { FaBookmark, FaTrashRestore } from 'react-icons/fa';
 import { BsThreeDots } from "react-icons/bs";
 import { GoHistory } from "react-icons/go";
 import { useNavigate } from 'react-router-dom';
-import { workoutService } from '../services/workoutService';
 
 function SavedPage() {
-  // UI State
   const [isScrolled, setIsScrolled] = useState(false);
   const [expandedItems, setExpandedItems] = useState({});
   const [openMenu, setOpenMenu] = useState(null);
+  const menuRef = useRef();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState('Recent (Latest)');
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,206 +22,119 @@ function SavedPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [newExercise, setNewExercise] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Data State
-  const [workouts, setWorkouts] = useState([]);
-  const [deletedWorkouts, setDeletedWorkouts] = useState([]);
-
-  // Modal State
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
-    type: null,
+    type: null, // 'workout' or 'exercise'
     itemToRemove: null,
     workoutIndex: null
   });
+  const [deletedWorkouts, setDeletedWorkouts] = useState([]);
   const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [workoutReplaceModal, setWorkoutReplaceModal] = useState({
     isOpen: false,
     workoutIndex: null
   });
 
-  const menuRef = useRef();
-  const navigate = useNavigate();
-
-  // Load workouts from API
   useEffect(() => {
-    const loadWorkouts = async () => {
-      setIsLoading(true);
-      try {
-        const [savedWorkouts, deletedWorkoutsList] = await Promise.all([
-          workoutService.getSavedWorkouts(),
-          workoutService.getDeletedWorkouts()
-        ]);
-        setWorkouts(savedWorkouts || []);
-        setDeletedWorkouts(deletedWorkoutsList || []);
-      } catch (error) {
-        console.error('Error loading workouts:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 100); // Adjust this value as needed
     };
 
-    loadWorkouts();
-  }, []);
-
-  // Scroll handler
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 100);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Click outside handler
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setOpenMenu(null);
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Workout Actions
-  const handleStartWorkout = async (e, index) => {
-    e.stopPropagation();
-    try {
-      const currentWorkout = await workoutService.getCurrentWorkout();
-      if (currentWorkout) {
-        setWorkoutReplaceModal({
-          isOpen: true,
-          workoutIndex: index
-        });
-        return;
-      }
-      startNewWorkout(index);
-    } catch (error) {
-      console.error('Error checking current workout:', error);
+  const defaultTemplates = [
+    { 
+      title: 'Push', 
+      lastDoneDate: '11/18/24',
+      exercises: [
+        'Bench Press',
+        'Chest Fly',
+        'Shoulder Press',
+        'Lateral Raise',
+        'Tricep Pushdown',
+        'Dips'
+      ]
+    },
+    { 
+      title: 'Pull', 
+      lastDoneDate: '11/16/24',
+      exercises: [
+        'Bent Over Row',
+        'Pull Up',
+        'Upper Back Row',
+        'Cable Pull Over',
+        'Rear Delt Fly',
+        'Bicep Curl'
+      ]
+    },
+    { 
+      title: 'Legs and Abs', 
+      lastDoneDate: '11/14/24',
+      exercises: [
+        'Hamstring Curl',
+        'Leg Press',
+        'Calf Raise',
+        'Leg Extension',
+        'Adductor Machine',
+        'Sit Ups'
+      ]
+    },
+    { 
+      title: 'Arms',
+      lastDoneDate: '11/12/24',
+      exercises: [
+        'Shoulder Press',
+        'Lateral Raise',
+        'Bicep Curl',
+        'Hammer Curl',
+        'Tricep Pushdown',
+        'Skullcrushers'
+      ]
+    },
+    { 
+      title: 'Upper Body',
+      lastDoneDate: '11/10/24',
+      exercises: [
+        'Incline Press',
+        'Lateral Raise',
+        'Shoulder Press',
+        'Upper Back Row',
+        'Lat Pulldown',
+        'Bicep Curl',
+        'Tricep Pushdown'
+      ]
+    },
+    { 
+      title: 'Lower Body',
+      lastDoneDate: '11/08/24',
+      exercises: [
+        'Squat',
+        'RDL',
+        'Calf Raise',
+        'Leg Extension',
+        'Leg Curl',
+        'Adductor Machine'
+      ]
     }
-  };
+  ];
 
-  const startNewWorkout = async (index) => {
-    try {
-      const selectedWorkout = workouts[index];
-      const result = await workoutService.startWorkout(selectedWorkout._id);
+  const [workouts, setWorkouts] = useState(defaultTemplates);  // Initialize with default templates
 
-      const updatedWorkout = await workoutService.updateWorkout(selectedWorkout._id, {
-        ...selectedWorkout,
-        lastDoneDate: new Date().toLocaleDateString()
-      });
-
-      setWorkouts(prevWorkouts => 
-        prevWorkouts.map((w, i) => i === index ? updatedWorkout : w)
-      );
-
-      navigate('/new-workout', {
-        state: {
-          workoutTemplate: {
-            title: selectedWorkout.title,
-            exercises: result.exercises,
-            currentWorkoutId: result._id
-          }
-        }
-      });
-    } catch (error) {
-      console.error('Error starting workout:', error);
-    }
-  };
-
-  const handleSaveTitle = async (index) => {
-    if (!editingText.trim()) return;
-    
-    try {
-      const workoutToUpdate = workouts[index];
-      const updatedWorkout = await workoutService.updateWorkout(workoutToUpdate._id, {
-        ...workoutToUpdate,
-        title: editingText.trim()
-      });
-
-      setWorkouts(prevWorkouts => {
-        const newWorkouts = [...prevWorkouts];
-        newWorkouts[index] = updatedWorkout;
-        return newWorkouts;
-      });
-    } catch (error) {
-      console.error('Error updating workout title:', error);
-    }
-
-    setEditingIndex(null);
-    setIsEditing(false);
-  };
-
-  const handleConfirmRemove = async () => {
-    try {
-      if (confirmationModal.type === 'workout') {
-        const { itemToRemove, workoutIndex } = confirmationModal;
-        await workoutService.deleteWorkout(itemToRemove._id);
-        
-        setWorkouts(prev => prev.filter((_, index) => index !== workoutIndex));
-        setDeletedWorkouts(prev => [{
-          ...itemToRemove,
-          deletedAt: new Date().toISOString()
-        }, ...prev].slice(0, 10));
-      } else if (confirmationModal.type === 'exercise' && selectedWorkout) {
-        const updatedExercises = selectedWorkout.exercises.filter(
-          (_, index) => index !== confirmationModal.workoutIndex
-        );
-        
-        const updatedWorkout = await workoutService.updateWorkout(selectedWorkout._id, {
-          ...selectedWorkout,
-          exercises: updatedExercises
-        });
-
-        setSelectedWorkout(updatedWorkout);
-        setWorkouts(prev => 
-          prev.map(w => w._id === selectedWorkout._id ? updatedWorkout : w)
-        );
-      }
-    } catch (error) {
-      console.error('Error removing item:', error);
-    }
-    
-    setConfirmationModal({
-      isOpen: false,
-      type: null,
-      itemToRemove: null,
-      workoutIndex: null
-    });
-  };
-
-  const handleRecoverWorkout = async (workout, index) => {
-    try {
-      const recoveredWorkout = await workoutService.recoverWorkout(workout._id);
-      setWorkouts(prev => [...prev, recoveredWorkout]);
-      setDeletedWorkouts(prev => prev.filter((_, i) => i !== index));
-    } catch (error) {
-      console.error('Error recovering workout:', error);
-    }
-  };
-
-  const handleAddExercise = async () => {
-    if (!newExercise.trim() || !selectedWorkout) return;
-    
-    try {
-      const updatedWorkout = {
-        ...selectedWorkout,
-        exercises: [...selectedWorkout.exercises, newExercise.trim()]
-      };
-      
-      const result = await workoutService.updateWorkout(selectedWorkout._id, updatedWorkout);
-      
-      setSelectedWorkout(result);
-      setWorkouts(prev => 
-        prev.map(w => w._id === selectedWorkout._id ? result : w)
-      );
-      setNewExercise('');
-    } catch (error) {
-      console.error('Error adding exercise:', error);
-    }
-  };
-
-  // UI Handlers
   const toggleItem = (index) => {
     setExpandedItems(prev => ({
       ...prev,
@@ -232,8 +144,12 @@ function SavedPage() {
 
   const handleMenuClick = (e, index) => {
     e.stopPropagation();
-    setOpenMenu(openMenu === index ? null : index);
-    setIsEditing(false);
+    if (openMenu === index) {
+      setOpenMenu(null);
+    } else {
+      setOpenMenu(index);
+      setIsEditing(false);
+    }
   };
 
   const handleRename = (e, index, item) => {
@@ -262,6 +178,143 @@ function SavedPage() {
     setOpenMenu(null);
   };
 
+  const handleSaveTitle = (index) => {
+    if (editingText.trim()) {
+      const updatedWorkouts = [...workouts];
+      updatedWorkouts[index] = {
+        ...updatedWorkouts[index],
+        title: editingText.trim()
+      };
+      setWorkouts(updatedWorkouts);
+      
+      // Save to localStorage
+      localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+    }
+    setEditingIndex(null);
+    setIsEditing(false);
+  };
+
+  // Load saved workouts from localStorage on component mount
+  useEffect(() => {
+    const savedWorkouts = JSON.parse(localStorage.getItem('workouts'));
+    
+    if (!savedWorkouts || savedWorkouts.length === 0) {
+      // If no saved workouts, use default templates
+      localStorage.setItem('workouts', JSON.stringify());
+      setWorkouts();
+    } else {
+      // Sort by lastDoneDate by default
+      savedWorkouts.sort((a, b) => 
+        new Date(b.lastDoneDate || '1900-01-01') - new Date(a.lastDoneDate || '1900-01-01')
+      );
+      setWorkouts(savedWorkouts);
+    }
+  }, []);
+
+  const getFilteredAndSortedItems = () => {
+    let filteredItems = [...workouts];
+    
+    if (searchQuery) {
+      filteredItems = filteredItems.filter(item => 
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.exercises.some(exercise => 
+          exercise.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+    
+    return filteredItems;
+  };
+
+  const filteredAndSortedItems = getFilteredAndSortedItems();
+
+  const handleStartWorkout = (e, index) => {
+    e.stopPropagation();
+    
+    // Check if there's an active workout
+    const currentWorkout = localStorage.getItem('currentWorkout');
+    if (currentWorkout) {
+      setWorkoutReplaceModal({
+        isOpen: true,
+        workoutIndex: index
+      });
+      return;
+    }
+
+    startNewWorkout(index);
+  };
+
+  const startNewWorkout = (index) => {
+    const updatedWorkouts = [...workouts];
+    const selectedWorkout = updatedWorkouts[index];
+    updatedWorkouts[index] = {
+      ...selectedWorkout,
+      lastDoneDate: new Date().toLocaleDateString('en-US', {
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit'
+      })
+    };
+    setWorkouts(updatedWorkouts);
+    localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+    
+    const formattedExercises = selectedWorkout.exercises.map(exercise => ({
+      title: exercise,
+      type: 'weight',
+      sets: []
+    }));
+
+    localStorage.setItem('currentWorkout', JSON.stringify(formattedExercises));
+    
+    navigate('/new-workout', { 
+      state: { 
+        workoutTemplate: {
+          title: selectedWorkout.title,
+          exercises: formattedExercises
+        }
+      }
+    });
+  };
+
+  const handleSortSelection = (option) => {
+    setSelectedSort(option);
+    setIsFilterOpen(false);
+    
+    const sortedWorkouts = [...workouts];
+    
+    switch(option) {
+      case 'Recent (Latest)':
+        sortedWorkouts.sort((a, b) => 
+          new Date(b.lastDoneDate) - new Date(a.lastDoneDate)
+        );
+        break;
+      
+      case 'Recent (Oldest)':
+        sortedWorkouts.sort((a, b) => 
+          new Date(a.lastDoneDate) - new Date(b.lastDoneDate)
+        );
+        break;
+      
+      case 'Name (A to Z)':
+        sortedWorkouts.sort((a, b) => 
+          a.title.localeCompare(b.title)
+        );
+        break;
+      
+      case 'Name (Z to A)':
+        sortedWorkouts.sort((a, b) => 
+          b.title.localeCompare(a.title)
+        );
+        break;
+      
+      default:
+        break;
+    }
+    
+    setWorkouts(sortedWorkouts);
+    localStorage.setItem('workouts', JSON.stringify(sortedWorkouts));
+  };
+
   const handleRemoveExercise = (exerciseIndex) => {
     setConfirmationModal({
       isOpen: true,
@@ -271,42 +324,79 @@ function SavedPage() {
     });
   };
 
-  const handleSortSelection = (option) => {
-    setSelectedSort(option);
-    setIsFilterOpen(false);
-    
-    const sortedWorkouts = [...workouts];
-    switch(option) {
-      case 'Recent (Latest)':
-        sortedWorkouts.sort((a, b) => new Date(b.lastDoneDate) - new Date(a.lastDoneDate));
-        break;
-      case 'Recent (Oldest)':
-        sortedWorkouts.sort((a, b) => new Date(a.lastDoneDate) - new Date(b.lastDoneDate));
-        break;
-      case 'Name (A to Z)':
-        sortedWorkouts.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      case 'Name (Z to A)':
-        sortedWorkouts.sort((a, b) => b.title.localeCompare(a.title));
-        break;
-      default:
-        break;
+  const handleAddExercise = () => {
+    if (newExercise.trim() && selectedWorkout) {
+      const updatedWorkout = {
+        ...selectedWorkout,
+        exercises: [...selectedWorkout.exercises, newExercise.trim()]
+      };
+      setSelectedWorkout(updatedWorkout);
+      
+      // Update workouts array
+      const updatedWorkouts = workouts.map(workout => 
+        workout.title === selectedWorkout.title ? updatedWorkout : workout
+      );
+      setWorkouts(updatedWorkouts);
+      localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+      
+      // Clear input
+      setNewExercise('');
     }
-    setWorkouts(sortedWorkouts);
   };
 
-  const getFilteredAndSortedItems = () => {
-    if (!searchQuery) return workouts;
+  const handleConfirmRemove = () => {
+    if (confirmationModal.type === 'workout') {
+      const updatedWorkouts = [...workouts];
+      const removedWorkout = updatedWorkouts.splice(confirmationModal.workoutIndex, 1)[0];
+      
+      // Add to deleted workouts with timestamp
+      const updatedDeletedWorkouts = [{
+        ...removedWorkout,
+        deletedAt: new Date().toISOString()
+      }, ...deletedWorkouts].slice(0, 10); // Keep last 10 deleted workouts
+      
+      setDeletedWorkouts(updatedDeletedWorkouts);
+      setWorkouts(updatedWorkouts);
+      
+      // Update both in localStorage
+      localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+      localStorage.setItem('deletedWorkouts', JSON.stringify(updatedDeletedWorkouts));
+    } else if (confirmationModal.type === 'exercise') {
+      const updatedWorkout = {
+        ...selectedWorkout,
+        exercises: selectedWorkout.exercises.filter((_, index) => index !== confirmationModal.workoutIndex)
+      };
+      setSelectedWorkout(updatedWorkout);
+      
+      const updatedWorkouts = workouts.map(workout => 
+        workout.title === selectedWorkout.title ? updatedWorkout : workout
+      );
+      setWorkouts(updatedWorkouts);
+      localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+    }
+    setConfirmationModal({ isOpen: false, type: null, itemToRemove: null, workoutIndex: null });
+  };
+
+  const handleRecoverWorkout = (workout, index) => {
+    // Add workout back to main list
+    const updatedWorkouts = [...workouts, workout];
+    setWorkouts(updatedWorkouts);
     
-    return workouts.filter(item => 
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.exercises.some(exercise => 
-        exercise.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
+    // Remove from deleted workouts
+    const updatedDeletedWorkouts = deletedWorkouts.filter((_, i) => i !== index);
+    setDeletedWorkouts(updatedDeletedWorkouts);
+    
+    // Update both in localStorage
+    localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+    localStorage.setItem('deletedWorkouts', JSON.stringify(updatedDeletedWorkouts));
   };
 
-  const filteredAndSortedItems = getFilteredAndSortedItems();
+  useEffect(() => {
+    const savedDeletedWorkouts = JSON.parse(localStorage.getItem('deletedWorkouts'));
+    if (savedDeletedWorkouts) {
+      setDeletedWorkouts(savedDeletedWorkouts);
+    }
+  }, []);
 
   return (
     <Container style={{ 
@@ -501,17 +591,7 @@ function SavedPage() {
           paddingBottom: '100px'
         }}
       >
-        {isLoading ? (
-          <div style={{
-            textAlign: 'center',
-            padding: '40px 20px',
-            color: '#666',
-            fontSize: '16px',
-            width: '100%'
-          }}>
-            Loading workouts...
-          </div>
-        ) : filteredAndSortedItems.length > 0 ? (
+        {filteredAndSortedItems.length > 0 ? (
           filteredAndSortedItems.map((item, index) => (
             <div key={index} style={{ 
               width: '99%',
