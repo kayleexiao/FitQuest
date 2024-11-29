@@ -1,146 +1,222 @@
-import { ActionIcon, Button, Container, Group, Text, Modal } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
+import { ActionIcon, Button, Container, Group, Text, Modal } from '@mantine/core';
 import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { workoutService } from '../services/workoutService';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
+import WeightExerciseCard from '../components/exercise/WeightExerciseCard';
 import BodyweightExerciseCard from '../components/exercise/BodyweightExerciseCard';
 import TimedExerciseCard from '../components/exercise/TimedExerciseCard';
-import WeightExerciseCard from '../components/exercise/WeightExerciseCard';
-import { useLocation, useNavigate } from 'react-router-dom';
 
 function NewWorkoutPage() {
   const location = useLocation();
-  const workoutTemplate = location.state?.workoutTemplate;
   const navigate = useNavigate();
+  const workoutTemplate = location.state?.workoutTemplate;
 
-  const [exercises, setExercises] = useState(() => JSON.parse(localStorage.getItem('currentWorkout')) || []);
+  const [exercises, setExercises] = useState([]);
   const [workoutTitle, setWorkoutTitle] = useState('New Workout');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentWorkoutId, setCurrentWorkoutId] = useState(null);
 
   useEffect(() => {
-    if (workoutTemplate) {
-      setWorkoutTitle(workoutTemplate.title);
-      setExercises(workoutTemplate.exercises);
-      localStorage.setItem('currentWorkout', JSON.stringify(workoutTemplate.exercises));
-    } else {
-      const returnedExercises = location.state?.exercises;
-      if (returnedExercises) {
-        setExercises(returnedExercises);
-        localStorage.setItem('currentWorkout', JSON.stringify(returnedExercises));
+    const loadCurrentWorkout = async () => {
+      setIsLoading(true);
+      try {
+        if (location.state?.exerciseAdded || workoutTemplate) {
+          const currentWorkout = await workoutService.getCurrentWorkout();
+          if (currentWorkout) {
+            setWorkoutTitle(currentWorkout.title);
+            setExercises(currentWorkout.exercises);
+            setCurrentWorkoutId(currentWorkout._id);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading current workout:', error);
+      } finally {
+        setIsLoading(false);
       }
+    };
+  
+    loadCurrentWorkout();
+  }, [location.state?.exerciseAdded, workoutTemplate]);
+
+  useEffect(() => {
+    const initializeWorkout = async () => {
+      setIsLoading(true);
+      try {
+        if (workoutTemplate) {
+          setWorkoutTitle(workoutTemplate.title);
+          setExercises(workoutTemplate.exercises);
+          setCurrentWorkoutId(workoutTemplate.currentWorkoutId);
+        } else {
+          // Check for existing current workout
+          const currentWorkout = await workoutService.getCurrentWorkout();
+          if (currentWorkout) {
+            setWorkoutTitle(currentWorkout.title);
+            setExercises(currentWorkout.exercises);
+            setCurrentWorkoutId(currentWorkout._id);
+          }
+        }
+      } catch (error) {
+        console.error('Error initializing workout:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeWorkout();
+  }, [workoutTemplate]);
+
+  const handleRepsChange = async (exerciseIndex, setIndex, newReps) => {
+    try {
+      const updatedSetData = {
+        reps: newReps,
+        weight: exercises[exerciseIndex].sets?.[setIndex]?.weight || 0
+      };
+
+      await workoutService.updateSet(currentWorkoutId, exerciseIndex, setIndex, updatedSetData);
+      await refreshWorkout(); 
+
+      const updatedExercises = [...exercises];
+      if (!updatedExercises[exerciseIndex].sets) {
+        updatedExercises[exerciseIndex].sets = [];
+      }
+      if (!updatedExercises[exerciseIndex].sets[setIndex]) {
+        updatedExercises[exerciseIndex].sets[setIndex] = {};
+      }
+      updatedExercises[exerciseIndex].sets[setIndex] = {
+        ...updatedExercises[exerciseIndex].sets[setIndex],
+        reps: newReps
+      };
+      setExercises(updatedExercises);
+    } catch (error) {
+      console.error('Error updating reps:', error);
     }
-  }, [workoutTemplate, location.state]);
+  };
+
+  const handleWeightChange = async (exerciseIndex, setIndex, newWeight) => {
+    try {
+      const updatedSetData = {
+        reps: exercises[exerciseIndex].sets?.[setIndex]?.reps || 0,
+        weight: newWeight
+      };
+
+      await workoutService.updateSet(currentWorkoutId, exerciseIndex, setIndex, updatedSetData);
+      await refreshWorkout();
+
+      const updatedExercises = [...exercises];
+      if (!updatedExercises[exerciseIndex].sets) {
+        updatedExercises[exerciseIndex].sets = [];
+      }
+      if (!updatedExercises[exerciseIndex].sets[setIndex]) {
+        updatedExercises[exerciseIndex].sets[setIndex] = {};
+      }
+      updatedExercises[exerciseIndex].sets[setIndex] = {
+        ...updatedExercises[exerciseIndex].sets[setIndex],
+        weight: newWeight
+      };
+      setExercises(updatedExercises);
+    } catch (error) {
+      console.error('Error updating weight:', error);
+    }
+  };
+
+  const handleAddSet = async (exerciseIndex) => {
+    try {
+      const newSetData = { reps: '', weight: '' };
+      await workoutService.addSet(currentWorkoutId, exerciseIndex, newSetData);
+      await refreshWorkout();
+
+      const updatedExercises = [...exercises];
+      if (!updatedExercises[exerciseIndex].sets) {
+        updatedExercises[exerciseIndex].sets = [];
+      }
+      updatedExercises[exerciseIndex].sets.push(newSetData);
+      setExercises(updatedExercises);
+    } catch (error) {
+      console.error('Error adding set:', error);
+    }
+  };
+
+  const handleRemoveSet = async (exerciseIndex, setIndex) => {
+    try {
+      await workoutService.removeSet(currentWorkoutId, exerciseIndex, setIndex);
+      await refreshWorkout();
+
+      const updatedExercises = [...exercises];
+      updatedExercises[exerciseIndex].sets.splice(setIndex, 1);
+      setExercises(updatedExercises);
+    } catch (error) {
+      console.error('Error removing set:', error);
+    }
+  };
+
+  const handleDeleteExercise = async (index) => {
+    try {
+      await workoutService.removeExercise(currentWorkoutId, index);
+      await refreshWorkout();
+
+      const updatedExercises = [...exercises];
+      updatedExercises.splice(index, 1);
+      setExercises(updatedExercises);
+    } catch (error) {
+      console.error('Error deleting exercise:', error);
+    }
+  };
+
+  const handleAddExercise = () => {
+    console.log('Add Exercise clicked, currentWorkoutId:', currentWorkoutId); // Debug log
+    navigate('/add-exercise');
+  };
 
   const handleFinishWorkout = () => {
     setIsSummaryModalOpen(true);
   };
 
-  const handleCompleteWorkout = () => {
+  const refreshWorkout = async () => {
     try {
-      // Get current date and time
-      const completionDate = new Date().toISOString();
-      
-      // Create workout history entry with null checks
-      const workoutHistory = {
-        title: workoutTitle || 'Workout',
-        date: completionDate,
-        exercises: exercises?.map(exercise => ({
-          title: exercise?.title || 'Exercise',
-          sets: Array.isArray(exercise?.sets) ? exercise.sets.map(set => ({
-            reps: set?.reps || 0,
-            weight: set?.weight || 0
-          })) : []
-        })) || []
-      };
-
-      // Safely get existing history
-      let existingHistory = [];
-      try {
-        existingHistory = JSON.parse(localStorage.getItem('workoutHistory')) || [];
-      } catch (e) {
-        console.error('Error parsing workout history:', e);
+      const currentWorkout = await workoutService.getCurrentWorkout();
+      if (currentWorkout) {
+        setExercises(currentWorkout.exercises);
       }
-      
-      // Add new workout to history
-      const updatedHistory = [workoutHistory, ...existingHistory];
-      localStorage.setItem('workoutHistory', JSON.stringify(updatedHistory));
+    } catch (error) {
+      console.error('Error refreshing workout:', error);
+    }
+  };
 
-      // Clear current workout
-      localStorage.removeItem('currentWorkout');
-      setExercises([]);
-      setWorkoutTitle('');
+  const handleCompleteWorkout = async () => {
+    try {
+      await workoutService.completeWorkout(currentWorkoutId);
+      await refreshWorkout(); 
       setIsSummaryModalOpen(false);
-      
-      // Navigate to history page
       navigate('/history');
     } catch (error) {
       console.error('Error completing workout:', error);
-      // Optionally show error to user
       alert('There was an error saving your workout. Please try again.');
     }
   };
 
-  const handleRepsChange = (exerciseIndex, setIndex, newReps) => {
-    const updatedExercises = [...exercises];
-    if (!updatedExercises[exerciseIndex].sets) {
-      updatedExercises[exerciseIndex].sets = [];
+  const handleUpdateTitle = async (newTitle) => {
+    try {
+      await workoutService.updateCurrentWorkout(currentWorkoutId, { title: newTitle });
+      await refreshWorkout(); 
+      setWorkoutTitle(newTitle);
+    } catch (error) {
+      console.error('Error updating workout title:', error);
     }
-    if (!updatedExercises[exerciseIndex].sets[setIndex]) {
-      updatedExercises[exerciseIndex].sets[setIndex] = {};
-    }
-    updatedExercises[exerciseIndex].sets[setIndex] = {
-      ...updatedExercises[exerciseIndex].sets[setIndex],
-      reps: newReps
-    };
-    setExercises(updatedExercises);
-    localStorage.setItem('currentWorkout', JSON.stringify(updatedExercises));
   };
 
-  const handleWeightChange = (exerciseIndex, setIndex, newWeight) => {
-    const updatedExercises = [...exercises];
-    if (!updatedExercises[exerciseIndex].sets) {
-      updatedExercises[exerciseIndex].sets = [];
-    }
-    if (!updatedExercises[exerciseIndex].sets[setIndex]) {
-      updatedExercises[exerciseIndex].sets[setIndex] = {};
-    }
-    updatedExercises[exerciseIndex].sets[setIndex] = {
-      ...updatedExercises[exerciseIndex].sets[setIndex],
-      weight: newWeight
-    };
-    setExercises(updatedExercises);
-    localStorage.setItem('currentWorkout', JSON.stringify(updatedExercises));
+  const handleTitleInputSubmit = async () => {
+    await handleUpdateTitle(workoutTitle);
+    setIsEditingTitle(false);
   };
 
-  const handleAddSet = (exerciseIndex) => {
-    const updatedExercises = [...exercises];
-    if (!updatedExercises[exerciseIndex].sets) {
-      updatedExercises[exerciseIndex].sets = [];
-    }
-    updatedExercises[exerciseIndex].sets.push({ reps: '', weight: '' });
-    setExercises(updatedExercises);
-    localStorage.setItem('currentWorkout', JSON.stringify(updatedExercises));
-  };
-
-  const handleRemoveSet = (exerciseIndex, setIndex) => {
-    const updatedExercises = [...exercises];
-    updatedExercises[exerciseIndex].sets.splice(setIndex, 1);
-    setExercises(updatedExercises);
-    localStorage.setItem('currentWorkout', JSON.stringify(updatedExercises));
-  };
-
-  const handleDeleteExercise = (index) => {
-    const updatedExercises = [...exercises];
-    updatedExercises.splice(index, 1);
-    setExercises(updatedExercises);
-    localStorage.setItem('currentWorkout', JSON.stringify(updatedExercises));
-  };
-
-  const handleAddExercise = () => {
-    localStorage.setItem('currentWorkout', JSON.stringify(exercises));
-    navigate('/add-exercise');
-  };
+  if (isLoading) {
+    return <div>Loading...</div>; // Consider using a proper loading component
+  }
 
   return (
     <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
@@ -162,7 +238,10 @@ function NewWorkoutPage() {
           type="text"
           value={workoutTitle}
           onChange={(e) => setWorkoutTitle(e.target.value)}
-          onBlur={() => setIsEditingTitle(false)} // Exit edit mode on blur
+          onBlur={handleTitleInputSubmit}
+          onKeyDown={(e) => {
+          if (e.key === 'Enter') handleTitleInputSubmit();
+        }}
           style={{ fontSize: '3.86vh', fontWeight: 650, border: 'none', outline: 'none', background: 'transparent', color: '#356B77', width: '100%' }}
         />
       ) : (

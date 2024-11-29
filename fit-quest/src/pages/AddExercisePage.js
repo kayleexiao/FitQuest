@@ -1,23 +1,65 @@
-import React, { useState } from 'react';
+import { ActionIcon, Button, Card, Container, Group, Text, TextInput } from '@mantine/core';
+import React, { useEffect, useState } from 'react';
+import { MdAdd, MdArrowBack } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { Container, Text, Button, TextInput, Group, Card, ActionIcon } from '@mantine/core';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
-import { MdArrowBack, MdAdd } from 'react-icons/md';
+import { workoutService } from '../services/workoutService';
+import axios from '../api/axios'; 
 
 function AddExercisePage() {
   const navigate = useNavigate();
-
   const [search, setSearch] = useState('');
-  const [recentExercises] = useState(() => {
-    const saved = localStorage.getItem('recentExercises');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [recentExercises, setRecentExercises] = useState([]);
+  const [exerciseTitle, setExerciseTitle] = useState(''); // Initialize exerciseTitle
+  const [exerciseType, setExerciseType] = useState(''); // Initialize exerciseType
 
-  const handleAddRecentExercise = (exercise) => {
-    const currentWorkout = JSON.parse(localStorage.getItem('currentWorkout')) || [];
-    localStorage.setItem('currentWorkout', JSON.stringify([...currentWorkout, exercise]));
+  // Load recent exercises from API
+  useEffect(() => {
+    const loadRecentExercises = async () => {
+      try {
+        const exercises = await workoutService.getRecentExercises();
+        setRecentExercises(exercises);
+      } catch (error) {
+        console.error('Error loading recent exercises:', error);
+      }
+    };
+
+    loadRecentExercises();
+  }, []);
+
+  const handleAddRecentExercise = async (exercise) => {
+    try {
+      
+    const newExercise = {
+      title: exerciseTitle.trim() || 'Untitled', // ensures title is trimmed and defaults to 'Untitled'
+      type: exerciseType,
+    };
+
+    // 1. Add the new exercise to the current workout via API
+    const currentWorkoutResponse = await axios.post('/api/currentWorkouts', newExercise);
+    if (!currentWorkoutResponse.data) {
+      alert('Failed to add the exercise to the current workout. Please try again.');
+      return;
+    }
+
+    // 2. Add the exercise to recent exercises if it's not a duplicate
+    const recentExercisesResponse = await axios.get('/api/exercises/recent'); // Fetch recent exercises
+    const recentExercises = recentExercisesResponse.data || [];
+    const isDuplicate = recentExercises.some(
+      (exercise) => exercise.title === newExercise.title && exercise.type === newExercise.type
+    );
+
+    if (!isDuplicate) {
+      await axios.post('/api/exercises/recent', newExercise); // Add to recent exercises
+    }
+
+    // 3. Navigate to the "New Workout" page
     navigate('/new-workout');
+  } catch (error) {
+    console.error('Error creating exercise:', error);
+    alert('An error occurred while creating the exercise.');
+  }
   };
 
   const handleCreateNewExercise = () => navigate('/create-exercise');

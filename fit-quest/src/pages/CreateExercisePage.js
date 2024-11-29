@@ -4,14 +4,36 @@ import { Container, Text, TextInput, Button, Group, ActionIcon } from '@mantine/
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 import { MdArrowBack } from 'react-icons/md';
+import axios from '../api/axios'; 
 
 function CreateExercisePage() {
   const navigate = useNavigate();
   const [exerciseTitle, setExerciseTitle] = useState('');
   const [selectedType, setSelectedType] = useState('');
+  const [exerciseType, setExerciseType] = useState('');
 
   const handleAddExercise = () => {
     const newExercise = { title: exerciseTitle.trim() || 'Untitled', type: selectedType };
+
+  const createExercise = async () => {
+    try {
+      const newExercise = { title: exerciseTitle.trim() || 'Untitled', type: selectedType };
+
+      // insert this here: send POST request to save exercise
+      const response = await axios.post('/api/exercises/recent', newExercise);
+
+      if (response.status === 201) {
+        alert('Exercise created successfully!');
+        setExerciseTitle(''); // reset form
+        setExerciseType(''); // reset type
+      } else {
+        alert('Failed to create exercise. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating exercise:', error);
+      alert('An error occurred while creating the exercise.');
+    }
+  };
 
     const currentWorkout = JSON.parse(localStorage.getItem('currentWorkout')) || [];
     localStorage.setItem('currentWorkout', JSON.stringify([...currentWorkout, newExercise]));
