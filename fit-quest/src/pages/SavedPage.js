@@ -3,7 +3,7 @@ import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 import { Container, TextInput, UnstyledButton, Modal } from '@mantine/core';
 import { IoSearchOutline, IoFilterOutline } from 'react-icons/io5';
-import { FaBookmark, FaTrashRestore } from 'react-icons/fa';
+import { FaTrashRestore } from 'react-icons/fa';
 import { BsThreeDots } from "react-icons/bs";
 import { GoHistory } from "react-icons/go";
 import { useNavigate } from 'react-router-dom';
@@ -529,14 +529,6 @@ function SavedPage() {
               fontStyle: 'italic',
               transition: 'all 0.3s ease',
             }}>Saved</span>
-            <FaBookmark 
-              size={20}
-              style={{ 
-                color: '#356B77', 
-                marginRight: '30px',
-                transition: 'all 0.3s ease',
-              }} 
-            />
           </div>
           <div />
         </Container>

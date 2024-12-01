@@ -1,5 +1,4 @@
 import { Container, Group, UnstyledButton, Text } from '@mantine/core';
-import { FaRegClock } from "react-icons/fa6";
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 
@@ -44,8 +43,7 @@ function HistoryPage() {
             >
               <i>History</i>
             </Text>
-            <FaRegClock size={'3.3rem'} style={{ paddingLeft: '1rem', color: '#356B77' }} />
-          </Group>
+        </Group>
       </Container>
         
         {/* Scrollable List */}

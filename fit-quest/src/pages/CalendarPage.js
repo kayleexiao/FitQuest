@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 import { Container } from '@mantine/core';
-import { MdOutlineCalendarMonth } from "react-icons/md";
 import MonthMenu from '../components/MonthMenu';
 import YearMenu from '../components/YearMenu';
 import WorkoutList from '../components/WorkoutList';
@@ -55,7 +54,7 @@ function CalendarPage() {
         style={{
           position: 'fixed',
           top: '5.36vh',
-          left: 0,
+          left: 0, 
           backgroundColor: 'rgba(0,0,0,0)',
           display: 'flex',
           justifyContent: 'space-between',
@@ -67,7 +66,6 @@ function CalendarPage() {
           <span style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650, marginRight: '1vw' }}>
             <i>Calendar</i>
           </span>
-          <MdOutlineCalendarMonth size={'4.29vh'} style={{ color: '#356B77' }} />
         </div>
       </Container>
 
