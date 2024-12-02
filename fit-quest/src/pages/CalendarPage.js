@@ -24,23 +24,28 @@ function CalendarPage() {
   // Load workouts for the selected date
   useEffect(() => {
     const loadWorkoutsForDate = () => {
-      const selectedDate = new Date(selectedYear, 
-        new Date(Date.parse(`${selectedMonth} 1, 2024`)).getMonth(), 
-        selectedDay
-      ).toISOString().split('T')[0];
+      // Create a proper date object for the selected date
+      const monthIndex = new Date(Date.parse(`${selectedMonth} 1, 2024`)).getMonth();
+      const selectedDate = new Date(selectedYear, monthIndex, selectedDay);
+      selectedDate.setHours(12, 0, 0, 0); // Set to noon to avoid timezone issues
+      
+      const dateString = selectedDate.toISOString();
 
       // Get workouts from storage for the selected date
       const allWorkouts = storage.history.getAll();
       const dateWorkouts = allWorkouts.filter(workout => {
-        const workoutDate = new Date(workout.date).toISOString().split('T')[0];
-        return workoutDate === selectedDate;
+        const workoutDate = new Date(workout.date);
+        workoutDate.setHours(0, 0, 0, 0);
+        const targetDate = new Date(selectedDate);
+        targetDate.setHours(0, 0, 0, 0);
+        return workoutDate.getTime() === targetDate.getTime();
       });
 
-      // Format workouts for display
+      // Format workouts for display, ensuring proper date handling
       const formattedWorkouts = dateWorkouts.map(workout => ({
-        id: workout.date, // using date as id since it should be unique
-        title: workout.title,
-        exercises: workout.exercises,
+        ...workout,
+        id: workout.date,
+        date: dateString, // Use the properly formatted date
         time: new Date(workout.date).toLocaleTimeString('en-US', {
           hour: 'numeric',
           minute: '2-digit',
