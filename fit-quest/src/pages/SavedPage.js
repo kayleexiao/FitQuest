@@ -36,6 +36,7 @@ function SavedPage() {
     workoutIndex: null
   });
   const navigate = useNavigate();
+  const [isWorkoutActive, setIsWorkoutActive] = useState(false);
 
   const [workouts, setWorkouts] = useState(() => {
     return storage.templates.getAll();
@@ -75,6 +76,11 @@ function SavedPage() {
   useEffect(() => {
     const savedDeletedWorkouts = storage.deletedWorkouts.getAll();
     setDeletedWorkouts(savedDeletedWorkouts);
+  }, []);
+
+  useEffect(() => {
+    const currentWorkout = storage.currentWorkout.get();
+    setIsWorkoutActive(!!currentWorkout);
   }, []);
 
   const toggleItem = (index) => {
@@ -323,15 +329,7 @@ function SavedPage() {
       display: 'flex',
       flexDirection: 'column'
     }}>
-      <Navbar style={{ 
-        position: 'fixed', 
-        bottom: 0, 
-        
-        left: 0, 
-        right: 0, 
-        zIndex: 9999,
-        backgroundColor: 'white'
-      }} />
+      <Navbar isWorkoutInProgress={isWorkoutActive} />
       
       {/* Fixed Statusbar */}
       <Container
@@ -722,7 +720,7 @@ function SavedPage() {
         zIndex: 9999,
         boxShadow: '0 -2px 10px rgba(0,0,0,0.1)'
       }}>
-        <Navbar />
+        <Navbar isWorkoutInProgress={isWorkoutActive} />
       </div>
 
       <Modal

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Container } from '@mantine/core';
+import { Container, ActionIcon } from '@mantine/core';
 import { MdOutlineExplore, MdAddCircleOutline, MdBookmarkBorder, MdHistory, MdOutlineCalendarMonth   } from "react-icons/md";
 
-function Navbar() {
+function Navbar({ isWorkoutInProgress }) {
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
 
@@ -22,16 +22,20 @@ function Navbar() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        zIndex: 9999
       }}
     >
       <Link to="/explore" style={{ flex: 1, textAlign: 'center' }}>
         <MdOutlineExplore color={isActive('/explore') ? 'white' : '#86B0BA'} size={'3.43vh'} />
       </Link>
-      <Link to="/new-workout" style={{ flex: 1, textAlign: 'center' }}>
-        <MdAddCircleOutline color={isActive('/new-workout') ? 'white' : '#86B0BA'} size={'3.43vh'} />
-      </Link>
       <Link to="/saved" style={{ flex: 1, textAlign: 'center' }}>
         <MdBookmarkBorder color={isActive('/saved') ? 'white' : '#86B0BA'} size={'3.43vh'} />
+      </Link>
+      <Link to="/new-workout" style={{ flex: 1, textAlign: 'center' }}>
+        <MdAddCircleOutline 
+          color={isActive('/new-workout') ? 'white' : '#86B0BA'} 
+          size={'4vh'} 
+        />
       </Link>
       <Link to="/history" style={{ flex: 1, textAlign: 'center' }}>
         <MdHistory color={isActive('/history') ? 'white' : '#86B0BA'} size={'3.43vh'} />
