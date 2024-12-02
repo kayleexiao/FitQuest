@@ -7,13 +7,17 @@ import BodyweightExerciseCard from '../components/exercise/BodyweightExerciseCar
 import TimedExerciseCard from '../components/exercise/TimedExerciseCard';
 import WeightExerciseCard from '../components/exercise/WeightExerciseCard';
 import { useLocation, useNavigate } from 'react-router-dom';
+import storage from '../utils/storage';
 
 function NewWorkoutPage() {
   const location = useLocation();
   const workoutTemplate = location.state?.workoutTemplate;
   const navigate = useNavigate();
 
-  const [exercises, setExercises] = useState(() => JSON.parse(localStorage.getItem('currentWorkout')) || []);
+  const [exercises, setExercises] = useState(() => {
+    const savedExercises = storage.currentWorkout.get();
+    return savedExercises || [];
+  });
   const [workoutTitle, setWorkoutTitle] = useState('New Workout');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
@@ -21,13 +25,23 @@ function NewWorkoutPage() {
   useEffect(() => {
     if (workoutTemplate) {
       setWorkoutTitle(workoutTemplate.title);
-      setExercises(workoutTemplate.exercises);
-      localStorage.setItem('currentWorkout', JSON.stringify(workoutTemplate.exercises));
+      // Ensure each exercise has an id
+      const exercisesWithIds = workoutTemplate.exercises.map(exercise => ({
+        ...exercise,
+        id: exercise.id || Date.now() + Math.random()
+      }));
+      setExercises(exercisesWithIds);
+      storage.currentWorkout.save(exercisesWithIds);
     } else {
       const returnedExercises = location.state?.exercises;
       if (returnedExercises) {
-        setExercises(returnedExercises);
-        localStorage.setItem('currentWorkout', JSON.stringify(returnedExercises));
+        // Ensure each exercise has an id
+        const exercisesWithIds = returnedExercises.map(exercise => ({
+          ...exercise,
+          id: exercise.id || Date.now() + Math.random()
+        }));
+        setExercises(exercisesWithIds);
+        storage.currentWorkout.save(exercisesWithIds);
       }
     }
   }, [workoutTemplate, location.state]);
@@ -36,38 +50,71 @@ function NewWorkoutPage() {
     setIsSummaryModalOpen(true);
   };
 
+// Inside NewWorkoutPage.js, in handleCompleteWorkout function
+
   const handleCompleteWorkout = () => {
     try {
-      // Get current date and time
       const completionDate = new Date().toISOString();
+      const formattedDate = new Date().toLocaleDateString('en-US', {
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit'
+      });
       
-      // Create workout history entry with null checks
+      // Format workout data for history
       const workoutHistory = {
         title: workoutTitle || 'Workout',
         date: completionDate,
         exercises: exercises?.map(exercise => ({
           title: exercise?.title || 'Exercise',
+          type: exercise?.type,  // Preserve the exercise type
           sets: Array.isArray(exercise?.sets) ? exercise.sets.map(set => ({
             reps: set?.reps || 0,
-            weight: set?.weight || 0
+            weight: set?.weight || 0,
+            time: set?.time || 0
           })) : []
         })) || []
       };
 
-      // Safely get existing history
-      let existingHistory = [];
-      try {
-        existingHistory = JSON.parse(localStorage.getItem('workoutHistory')) || [];
-      } catch (e) {
-        console.error('Error parsing workout history:', e);
+      // Save to history
+      storage.history.add(workoutHistory);
+
+      // Handle template saving/updating
+      if (workoutTemplate) {
+        // This is a workout started from saved page - update the template's last done date
+        const savedTemplates = storage.templates.getAll();
+        const updatedTemplates = savedTemplates.map(template => {
+          if (template.title === workoutTemplate.title) {
+            return {
+              ...template,
+              lastDoneDate: formattedDate,
+              exercises: exercises.map(exercise => ({
+                title: exercise.title,
+                type: exercise.type  // Preserve the exercise type when updating template
+              }))
+            };
+          }
+          return template;
+        });
+        storage.templates.save(updatedTemplates);
+      } else {
+        // This is a new workout - save it as a template
+        const newTemplate = {
+          title: workoutTitle,
+          exercises: exercises.map(exercise => ({
+            title: exercise.title,
+            type: exercise.type  // Preserve the exercise type when creating new template
+          })),
+          lastDoneDate: formattedDate,
+          createdAt: new Date().toISOString()
+        };
+        storage.templates.add(newTemplate);
       }
-      
-      // Add new workout to history
-      const updatedHistory = [workoutHistory, ...existingHistory];
-      localStorage.setItem('workoutHistory', JSON.stringify(updatedHistory));
 
       // Clear current workout
-      localStorage.removeItem('currentWorkout');
+      storage.currentWorkout.clear();
+      
+      // Reset state
       setExercises([]);
       setWorkoutTitle('');
       setIsSummaryModalOpen(false);
@@ -76,146 +123,174 @@ function NewWorkoutPage() {
       navigate('/history');
     } catch (error) {
       console.error('Error completing workout:', error);
-      // Optionally show error to user
       alert('There was an error saving your workout. Please try again.');
     }
   };
 
-  const handleRepsChange = (exerciseIndex, setIndex, newReps) => {
-    const updatedExercises = [...exercises];
-    if (!updatedExercises[exerciseIndex].sets) {
-      updatedExercises[exerciseIndex].sets = [];
-    }
-    if (!updatedExercises[exerciseIndex].sets[setIndex]) {
-      updatedExercises[exerciseIndex].sets[setIndex] = {};
-    }
-    updatedExercises[exerciseIndex].sets[setIndex] = {
-      ...updatedExercises[exerciseIndex].sets[setIndex],
-      reps: newReps
-    };
+  const handleRepsChange = (exerciseId, setIndex, newReps) => {
+    const updatedExercises = exercises.map(exercise => {
+      if (exercise.id === exerciseId) {
+        const updatedSets = [...(exercise.sets || [])];
+        if (!updatedSets[setIndex]) {
+          updatedSets[setIndex] = {};
+        }
+        updatedSets[setIndex] = { ...updatedSets[setIndex], reps: newReps };
+        return { ...exercise, sets: updatedSets };
+      }
+      return exercise;
+    });
     setExercises(updatedExercises);
-    localStorage.setItem('currentWorkout', JSON.stringify(updatedExercises));
+    storage.currentWorkout.save(updatedExercises);
   };
 
-  const handleWeightChange = (exerciseIndex, setIndex, newWeight) => {
-    const updatedExercises = [...exercises];
-    if (!updatedExercises[exerciseIndex].sets) {
-      updatedExercises[exerciseIndex].sets = [];
-    }
-    if (!updatedExercises[exerciseIndex].sets[setIndex]) {
-      updatedExercises[exerciseIndex].sets[setIndex] = {};
-    }
-    updatedExercises[exerciseIndex].sets[setIndex] = {
-      ...updatedExercises[exerciseIndex].sets[setIndex],
-      weight: newWeight
-    };
+  const handleWeightChange = (exerciseId, setIndex, newWeight) => {
+    const updatedExercises = exercises.map(exercise => {
+      if (exercise.id === exerciseId) {
+        const updatedSets = [...(exercise.sets || [])];
+        if (!updatedSets[setIndex]) {
+          updatedSets[setIndex] = {};
+        }
+        updatedSets[setIndex] = { ...updatedSets[setIndex], weight: newWeight };
+        return { ...exercise, sets: updatedSets };
+      }
+      return exercise;
+    });
     setExercises(updatedExercises);
-    localStorage.setItem('currentWorkout', JSON.stringify(updatedExercises));
+    storage.currentWorkout.save(updatedExercises);
   };
 
-  const handleAddSet = (exerciseIndex) => {
-    const updatedExercises = [...exercises];
-    if (!updatedExercises[exerciseIndex].sets) {
-      updatedExercises[exerciseIndex].sets = [];
-    }
-    updatedExercises[exerciseIndex].sets.push({ reps: '', weight: '' });
+  const handleAddSet = (exerciseId) => {
+    const updatedExercises = exercises.map(exercise => {
+      if (exercise.id === exerciseId) {
+        return {
+          ...exercise,
+          sets: [...(exercise.sets || []), { reps: '', weight: '' }]
+        };
+      }
+      return exercise;
+    });
     setExercises(updatedExercises);
-    localStorage.setItem('currentWorkout', JSON.stringify(updatedExercises));
+    storage.currentWorkout.save(updatedExercises);
   };
 
-  const handleRemoveSet = (exerciseIndex, setIndex) => {
-    const updatedExercises = [...exercises];
-    updatedExercises[exerciseIndex].sets.splice(setIndex, 1);
+  const handleRemoveSet = (exerciseId, setIndex) => {
+    const updatedExercises = exercises.map(exercise => {
+      if (exercise.id === exerciseId) {
+        const newSets = [...exercise.sets];
+        newSets.splice(setIndex, 1);
+        return { ...exercise, sets: newSets };
+      }
+      return exercise;
+    });
     setExercises(updatedExercises);
-    localStorage.setItem('currentWorkout', JSON.stringify(updatedExercises));
+    storage.currentWorkout.save(updatedExercises);
   };
 
-  const handleDeleteExercise = (index) => {
-    const updatedExercises = [...exercises];
-    updatedExercises.splice(index, 1);
+  const handleDeleteExercise = (exerciseId) => {
+    const updatedExercises = exercises.filter(exercise => exercise.id !== exerciseId);
     setExercises(updatedExercises);
-    localStorage.setItem('currentWorkout', JSON.stringify(updatedExercises));
+    storage.currentWorkout.save(updatedExercises);
   };
 
   const handleAddExercise = () => {
-    localStorage.setItem('currentWorkout', JSON.stringify(exercises));
+    storage.currentWorkout.save(exercises);
     navigate('/add-exercise');
+  };
+
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
   return (
     <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
-      {/* Fixed Status Bar */}
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1, maxWidth: '100%', margin: 'auto', backgroundColor: '#fff' }}>
         <Statusbar />
       </div>
 
-      {/* Scrollable Content */}
       <Container style={{ paddingBottom: '90px', paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
         <Navbar />
 
-{/* Title Section */}
-<Group position="apart" style={{ marginTop: '2rem', justifyContent: 'space-between', alignItems: 'center' }}>
-  <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-    <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-      {isEditingTitle ? (
-        <input
-          type="text"
-          value={workoutTitle}
-          onChange={(e) => setWorkoutTitle(e.target.value)}
-          onBlur={() => setIsEditingTitle(false)} // Exit edit mode on blur
-          style={{ fontSize: '3.86vh', fontWeight: 650, border: 'none', outline: 'none', background: 'transparent', color: '#356B77', width: '100%' }}
-        />
-      ) : (
-        <Text style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650 }}>
-          <i>{workoutTitle}</i>
-        </Text>
-      )}
-    </div>
-    <ActionIcon
-      variant="transparent"
-      onClick={() => setIsEditingTitle((prev) => !prev)} // Toggle edit mode
-      style={{ color: isEditingTitle ? '#1e90ff' : '#356B77', marginLeft: '8px' }}
-    >
-      <MdEdit size={24} />
-    </ActionIcon>
-  </div>
-</Group>
+        <Group position="apart" style={{ marginTop: '2rem', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+              {isEditingTitle ? (
+                <input
+                  type="text"
+                  value={workoutTitle}
+                  onChange={(e) => setWorkoutTitle(e.target.value)}
+                  onBlur={() => setIsEditingTitle(false)}
+                  style={{ fontSize: '3.86vh', fontWeight: 650, border: 'none', outline: 'none', background: 'transparent', color: '#356B77', width: '100%' }}
+                />
+              ) : (
+                <Text style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650 }}>
+                  <i>{workoutTitle}</i>
+                </Text>
+              )}
+            </div>
+            <ActionIcon
+              variant="transparent"
+              onClick={() => setIsEditingTitle((prev) => !prev)}
+              style={{ color: isEditingTitle ? '#1e90ff' : '#356B77', marginLeft: '8px' }}
+            >
+              <MdEdit size={24} />
+            </ActionIcon>
+          </div>
+        </Group>
 
-
-
-
-        {/* Exercise Cards */}
         <div style={{ marginTop: '1rem' }}>
           {exercises.length > 0 ? (
-            exercises.map((exercise, index) => {
-              if (exercise.type === 'weight') {
-                return <WeightExerciseCard
-                  key={index}
-                  title={exercise.title}
-                  sets={exercise.sets || []}
-                  onRepsChange={(setIndex, newReps) => handleRepsChange(index, setIndex, newReps)}
-                  onWeightChange={(setIndex, newWeight) => handleWeightChange(index, setIndex, newWeight)}
-                  onAddSet={() => handleAddSet(index)}
-                  onRemoveSet={(setIndex) => handleRemoveSet(index, setIndex)}
-                  onDelete={() => handleDeleteExercise(index)}
-                />;
-              } else if (exercise.type === 'bodyweight') {
-                return <BodyweightExerciseCard key={index} title={exercise.title} onDelete={() => handleDeleteExercise(index)} />;
-              } else if (exercise.type === 'timed') {
-                return <TimedExerciseCard key={index} title={exercise.title} onDelete={() => handleDeleteExercise(index)} />;
-              }
-              return null;
-            })
-          ) : (
-            <div>
-              <Text size="lg" weight={500} style={{ color: '#9E9E9E', margin: '50px' }}>
-                Add your first exercise
-              </Text>
-            </div>
-          )}
-        </div>
+          exercises.map((exercise) => {
+          const key = exercise.id || `${exercise.title}-${Math.random()}`;
 
-        {/* Add Exercise Button */}
+          if (exercise.type === 'weight') {
+            return (
+              <WeightExerciseCard
+                key={key}
+                id={exercise.id}
+                title={exercise.title}
+                sets={exercise.sets || []}
+                onRepsChange={(setIndex, newReps) => handleRepsChange(exercise.id, setIndex, newReps)}
+                onWeightChange={(setIndex, newWeight) => handleWeightChange(exercise.id, setIndex, newWeight)}
+                onAddSet={() => handleAddSet(exercise.id)}
+                onRemoveSet={(setIndex) => handleRemoveSet(exercise.id, setIndex)}
+                onDelete={() => handleDeleteExercise(exercise.id)}
+              />
+            );
+          } else if (exercise.type === 'bodyweight') {
+            return (
+              <BodyweightExerciseCard
+                key={key}
+                id={exercise.id}
+                title={exercise.title}
+                sets={exercise.sets || []}
+                onDelete={() => handleDeleteExercise(exercise.id)}
+              />
+            );
+          } else if (exercise.type === 'timed') {
+            return (
+              <TimedExerciseCard
+                key={key}
+                id={exercise.id}
+                title={exercise.title}
+                sets={exercise.sets || []}
+                onDelete={() => handleDeleteExercise(exercise.id)}
+              />
+            );
+          }
+          return null;
+        })
+        ) : (
+        <div>
+          <Text size="lg" weight={500} style={{ color: '#9E9E9E', margin: '50px' }}>
+            Add your first exercise
+          </Text>
+        </div>
+        )}
+      </div>
+
         <ActionIcon
           size='xl'
           variant="transparent"
@@ -225,7 +300,6 @@ function NewWorkoutPage() {
           <MdAddCircleOutline size={50} />
         </ActionIcon>
 
-        {/* Finish Workout */}
         <Group position="center" style={{ marginTop: '2rem' }}>
           <Button
             disabled={!exercises.length}
@@ -247,6 +321,7 @@ function NewWorkoutPage() {
           </Button>
         </Group>
 
+        {/* Workout Summary Modal */}
         <Modal
           opened={isSummaryModalOpen}
           onClose={() => setIsSummaryModalOpen(false)}
@@ -285,7 +360,7 @@ function NewWorkoutPage() {
             <div style={{ marginBottom: '30px' }}>
               {exercises.map((exercise, index) => (
                 <div 
-                  key={index}
+                  key={exercise.id}
                   style={{
                     backgroundColor: '#f5f5f5',
                     borderRadius: '10px',
@@ -305,7 +380,7 @@ function NewWorkoutPage() {
                     display: 'grid',
                     gap: '10px'
                   }}>
-                    {exercise.sets && exercise.sets.map((set, setIndex) => (
+                    {exercise.sets.map((set, setIndex) => (
                       <div 
                         key={setIndex}
                         style={{
@@ -320,7 +395,11 @@ function NewWorkoutPage() {
                       >
                         <span style={{ fontWeight: 500 }}>Set {setIndex + 1}</span>
                         <span style={{ color: '#666' }}>
-                          {set.weight} × {set.reps}
+                          {exercise.type === 'weight'
+                            ? `${set.weight}kg × ${set.reps} reps`
+                            : exercise.type === 'bodyweight'
+                            ? `${set.reps} reps`
+                            : `${formatTime(set.time)} seconds`}
                         </span>
                       </div>
                     ))}

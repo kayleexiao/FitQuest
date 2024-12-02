@@ -11,6 +11,7 @@ import WorkoutPage from './pages/WorkoutPage';
 import NewWorkoutPage from './pages/NewWorkoutPage';
 import CreateExercisePage from './pages/CreateExercisePage';
 import AddExercisePage from './pages/AddExercisePage';
+import WorkoutDetailPage from './pages/WorkoutDetailPage';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/history/workout" element={<WorkoutDetailPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/saved" element={<SavedPage />} />

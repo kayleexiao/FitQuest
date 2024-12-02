@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 import { Container } from '@mantine/core';
@@ -6,9 +6,9 @@ import MonthMenu from '../components/MonthMenu';
 import YearMenu from '../components/YearMenu';
 import WorkoutList from '../components/WorkoutList';
 import Calendar from '../components/Calendar';
+import storage from '../utils/storage';
 
 function CalendarPage() {
-
   const currentMonthIndex = new Date().getMonth();
   const currentYear = new Date().getFullYear();
   const currentDay = new Date().getDate();
@@ -17,38 +17,77 @@ function CalendarPage() {
     new Date(currentYear, currentMonthIndex).toLocaleString('default', { month: 'long' })
   );
   const [selectedYear, setSelectedYear] = useState(currentYear);
-
   const [selectedDay, setSelectedDay] = useState(currentDay);
+  const [workouts, setWorkouts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load workouts for the selected date
+  useEffect(() => {
+    const loadWorkoutsForDate = () => {
+      const selectedDate = new Date(selectedYear, 
+        new Date(Date.parse(`${selectedMonth} 1, 2024`)).getMonth(), 
+        selectedDay
+      ).toISOString().split('T')[0];
+
+      // Get workouts from storage for the selected date
+      const allWorkouts = storage.history.getAll();
+      const dateWorkouts = allWorkouts.filter(workout => {
+        const workoutDate = new Date(workout.date).toISOString().split('T')[0];
+        return workoutDate === selectedDate;
+      });
+
+      // Format workouts for display
+      const formattedWorkouts = dateWorkouts.map(workout => ({
+        id: workout.date, // using date as id since it should be unique
+        title: workout.title,
+        exercises: workout.exercises,
+        time: new Date(workout.date).toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        })
+      }));
+
+      setWorkouts(formattedWorkouts);
+      setLoading(false);
+    };
+
+    loadWorkoutsForDate();
+  }, [selectedMonth, selectedYear, selectedDay]);
 
   const handleMonthChange = (month) => {
     setSelectedMonth(month);
   };
 
   const handleYearChange = (year) => {
-    setSelectedYear(year);
+    setSelectedYear(parseInt(year));
   };
 
   const handleDayChange = (day) => {
     setSelectedDay(day);
   };
 
-  const [items, setItems] = useState([]);
-
-  const addItem = () => {
-    setItems([
-      ...items,
-      `${selectedMonth} ${selectedDay}, ${selectedYear} - Workout ${items.length + 1}`
-    ]);
-  };
-
-  const removeLastItem = () => {
-    setItems(items.slice(0, -1));
+  // Check if a particular date has workouts (for calendar highlighting)
+  const getWorkoutDates = () => {
+    const allWorkouts = storage.history.getAll();
+    const workoutDates = new Set();
+    
+    allWorkouts.forEach(workout => {
+      const date = new Date(workout.date);
+      if (date.getMonth() === new Date(Date.parse(`${selectedMonth} 1, 2024`)).getMonth() &&
+          date.getFullYear() === selectedYear) {
+        workoutDates.add(date.getDate());
+      }
+    });
+    
+    return workoutDates;
   };
 
   return (
     <Container>
       <Navbar />
       <Statusbar />
+      {/* Title */}
       <Container
         fluid
         style={{
@@ -69,20 +108,22 @@ function CalendarPage() {
         </div>
       </Container>
 
+      {/* Selected Date Display */}
       <div style={{
-          position: 'fixed',
-          top: '65vh',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          fontSize: '2.58vh',
-          fontWeight: '600',
-          color: '#356B77',
-          textAlign: 'center',
-          width: '100%',
-        }}>
-          <i>{selectedMonth} {selectedDay || '??'}, {selectedYear}</i>
+        position: 'fixed',
+        top: '65vh',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        fontSize: '2.58vh',
+        fontWeight: '600',
+        color: '#356B77',
+        textAlign: 'center',
+        width: '100%',
+      }}>
+        <i>{selectedMonth} {selectedDay || '??'}, {selectedYear}</i>
       </div>
 
+      {/* Workout List */}
       <div style={{
         position: 'fixed',
         flexDirection: 'column',
@@ -94,35 +135,24 @@ function CalendarPage() {
         overflowY: 'auto',
         borderRadius: '10px'
       }}>
-        <WorkoutList items={items} />
+        <WorkoutList 
+          items={workouts} // Pass the full workout objects instead of just formatted strings
+          isLoading={loading}
+        />
       </div>
 
-      <div style={{
-          position: 'fixed',
-          flexDirection: 'column',
-          marginTop: '84vh',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          height: '3.21vh',
-          width: '80%',
-        }}>
-        <button onClick={addItem} style={{ marginRight: '2.31vw', padding: 'min(2.31vw, 1.07vh)', borderRadius: '5px', backgroundColor: '#356B77', color: 'white', border: 'none', cursor: 'pointer', fontSize: 'min(2.31vw, 1.07vh)' }}>
-          Add Workout (Temp)
-        </button>
-        <button onClick={removeLastItem} style={{ padding: 'min(2.31vw, 1.07vh)', borderRadius: '5px', backgroundColor: '#E74C3C', color: 'white', border: 'none', cursor: 'pointer', fontSize: 'min(2.31vw, 1.07vh)' }}>
-          Remove Last Workout (Temp)
-        </button>
-      </div>
-
+      {/* Calendar */}
       <div style={{ marginTop: '18vh', display: 'flex', justifyContent: 'center', position: 'fixed', left: '50%', transform: 'translate(-50%, 0%)' }}>
         <Calendar 
           selectedMonth={selectedMonth} 
           selectedYear={selectedYear}
           selectedDay={selectedDay}
           onDayClick={handleDayChange}
+          workoutDates={getWorkoutDates()}
         />
       </div>
 
+      {/* Month/Year Selection */}
       <Container
         fluid
         style={{

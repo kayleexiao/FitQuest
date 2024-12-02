@@ -4,6 +4,7 @@ import { Container, Text, TextInput, Button, Group, ActionIcon } from '@mantine/
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 import { MdArrowBack } from 'react-icons/md';
+import storage from '../utils/storage';
 
 function CreateExercisePage() {
   const navigate = useNavigate();
@@ -11,18 +12,27 @@ function CreateExercisePage() {
   const [selectedType, setSelectedType] = useState('');
 
   const handleAddExercise = () => {
-    const newExercise = { title: exerciseTitle.trim() || 'Untitled', type: selectedType };
-
-    const currentWorkout = JSON.parse(localStorage.getItem('currentWorkout')) || [];
-    localStorage.setItem('currentWorkout', JSON.stringify([...currentWorkout, newExercise]));
-
-    const recentExercises = JSON.parse(localStorage.getItem('recentExercises')) || [];
-    const isDuplicate = recentExercises.some(
-      (exercise) => exercise.title === newExercise.title && exercise.type === newExercise.type
-    );
-    if (!isDuplicate) {
-      localStorage.setItem('recentExercises', JSON.stringify([...recentExercises, newExercise]));
+    if (!exerciseTitle.trim() || !selectedType) {
+      return; // Don't proceed if title is empty or no type selected
     }
+
+    const newExercise = {
+      id: Date.now(),
+      title: exerciseTitle.trim(),
+      type: selectedType,
+      createdAt: new Date().toISOString()
+    };
+
+    // Add to current workout
+    const currentWorkout = storage.currentWorkout.get() || [];
+    const workoutExercise = {
+      ...newExercise,
+      sets: [] // Initialize empty sets for the new exercise
+    };
+    storage.currentWorkout.save([...currentWorkout, workoutExercise]);
+
+    // Add to recent exercises
+    storage.recentExercises.add(newExercise);
 
     navigate('/new-workout');
   };
@@ -40,7 +50,7 @@ function CreateExercisePage() {
             <MdArrowBack size={34} color="#356B77" />
           </ActionIcon>
           <Text size="xl" weight={600} style={{ fontSize: '28px', color: '#356B77', textAlign: 'center' }}>
-            Create New Exercise
+            <i>Create New Exercise</i>
           </Text>
         </Group>
 
@@ -106,10 +116,10 @@ function CreateExercisePage() {
         <Button
           fullWidth
           onClick={handleAddExercise}
-          disabled={!selectedType}
+          disabled={!selectedType || !exerciseTitle.trim()}
           style={{
             marginTop: '2rem',
-            backgroundColor: selectedType ? '#356B77' : '#ddd',
+            backgroundColor: selectedType && exerciseTitle.trim() ? '#356B77' : '#ddd',
             color: 'white',
             fontWeight: 'bold',
             fontSize: '25px',

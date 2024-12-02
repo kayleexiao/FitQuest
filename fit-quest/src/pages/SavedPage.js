@@ -7,6 +7,7 @@ import { FaTrashRestore } from 'react-icons/fa';
 import { BsThreeDots } from "react-icons/bs";
 import { GoHistory } from "react-icons/go";
 import { useNavigate } from 'react-router-dom';
+import storage from '../utils/storage';
 
 function SavedPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -24,22 +25,26 @@ function SavedPage() {
   const [newExercise, setNewExercise] = useState('');
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
-    type: null, // 'workout' or 'exercise'
+    type: null,
     itemToRemove: null,
     workoutIndex: null
   });
   const [deletedWorkouts, setDeletedWorkouts] = useState([]);
   const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
-  const navigate = useNavigate();
   const [workoutReplaceModal, setWorkoutReplaceModal] = useState({
     isOpen: false,
     workoutIndex: null
+  });
+  const navigate = useNavigate();
+
+  const [workouts, setWorkouts] = useState(() => {
+    return storage.templates.getAll();
   });
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 100); // Adjust this value as needed
+      setIsScrolled(scrollPosition > 100);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -57,83 +62,20 @@ function SavedPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const defaultTemplates = [
-    { 
-      title: 'Push', 
-      lastDoneDate: '11/18/24',
-      exercises: [
-        'Bench Press',
-        'Chest Fly',
-        'Shoulder Press',
-        'Lateral Raise',
-        'Tricep Pushdown',
-        'Dips'
-      ]
-    },
-    { 
-      title: 'Pull', 
-      lastDoneDate: '11/16/24',
-      exercises: [
-        'Bent Over Row',
-        'Pull Up',
-        'Upper Back Row',
-        'Cable Pull Over',
-        'Rear Delt Fly',
-        'Bicep Curl'
-      ]
-    },
-    { 
-      title: 'Legs and Abs', 
-      lastDoneDate: '11/14/24',
-      exercises: [
-        'Hamstring Curl',
-        'Leg Press',
-        'Calf Raise',
-        'Leg Extension',
-        'Adductor Machine',
-        'Sit Ups'
-      ]
-    },
-    { 
-      title: 'Arms',
-      lastDoneDate: '11/12/24',
-      exercises: [
-        'Shoulder Press',
-        'Lateral Raise',
-        'Bicep Curl',
-        'Hammer Curl',
-        'Tricep Pushdown',
-        'Skullcrushers'
-      ]
-    },
-    { 
-      title: 'Upper Body',
-      lastDoneDate: '11/10/24',
-      exercises: [
-        'Incline Press',
-        'Lateral Raise',
-        'Shoulder Press',
-        'Upper Back Row',
-        'Lat Pulldown',
-        'Bicep Curl',
-        'Tricep Pushdown'
-      ]
-    },
-    { 
-      title: 'Lower Body',
-      lastDoneDate: '11/08/24',
-      exercises: [
-        'Squat',
-        'RDL',
-        'Calf Raise',
-        'Leg Extension',
-        'Leg Curl',
-        'Adductor Machine'
-      ]
+  useEffect(() => {
+    const savedWorkouts = storage.templates.getAll();
+    if (savedWorkouts.length > 0) {
+      savedWorkouts.sort((a, b) => 
+        new Date(b.lastDoneDate || '1900-01-01') - new Date(a.lastDoneDate || '1900-01-01')
+      );
+      setWorkouts(savedWorkouts);
     }
-  ];
+  }, []);
 
-  const [workouts, setWorkouts] = useState(defaultTemplates);  // Initialize with default templates
+  useEffect(() => {
+    const savedDeletedWorkouts = storage.deletedWorkouts.getAll();
+    setDeletedWorkouts(savedDeletedWorkouts);
+  }, []);
 
   const toggleItem = (index) => {
     setExpandedItems(prev => ({
@@ -178,11 +120,6 @@ function SavedPage() {
     setOpenMenu(null);
   };
 
-  const getTodayDate = () => {
-    const today = new Date();
-    return `${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getDate().toString().padStart(2, '0')}/${today.getFullYear().toString().slice(-2)}`;
-  };
-
   const handleSaveTitle = (index) => {
     if (editingText.trim()) {
       const updatedWorkouts = [...workouts];
@@ -191,30 +128,11 @@ function SavedPage() {
         title: editingText.trim()
       };
       setWorkouts(updatedWorkouts);
-      
-      // Save to localStorage
-      localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+      storage.templates.save(updatedWorkouts);
     }
     setEditingIndex(null);
     setIsEditing(false);
   };
-
-  // Load saved workouts from localStorage on component mount
-  useEffect(() => {
-    const savedWorkouts = JSON.parse(localStorage.getItem('workouts'));
-    
-    if (!savedWorkouts || savedWorkouts.length === 0) {
-      // If no saved workouts, use default templates
-      localStorage.setItem('workouts', JSON.stringify(defaultTemplates));
-      setWorkouts(defaultTemplates);
-    } else {
-      // Sort by lastDoneDate by default
-      savedWorkouts.sort((a, b) => 
-        new Date(b.lastDoneDate || '1900-01-01') - new Date(a.lastDoneDate || '1900-01-01')
-      );
-      setWorkouts(savedWorkouts);
-    }
-  }, []);
 
   const getFilteredAndSortedItems = () => {
     let filteredItems = [...workouts];
@@ -231,13 +149,10 @@ function SavedPage() {
     return filteredItems;
   };
 
-  const filteredAndSortedItems = getFilteredAndSortedItems();
-
   const handleStartWorkout = (e, index) => {
     e.stopPropagation();
     
-    // Check if there's an active workout
-    const currentWorkout = localStorage.getItem('currentWorkout');
+    const currentWorkout = storage.currentWorkout.get();
     if (currentWorkout) {
       setWorkoutReplaceModal({
         isOpen: true,
@@ -248,6 +163,8 @@ function SavedPage() {
 
     startNewWorkout(index);
   };
+
+// Inside SavedPage.js
 
   const startNewWorkout = (index) => {
     const updatedWorkouts = [...workouts];
@@ -261,15 +178,24 @@ function SavedPage() {
       })
     };
     setWorkouts(updatedWorkouts);
-    localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+    storage.templates.save(updatedWorkouts);
     
+    // Format exercises preserving their types
     const formattedExercises = selectedWorkout.exercises.map(exercise => ({
-      title: exercise,
-      type: 'weight',
+      id: Date.now() + Math.random(),
+      title: typeof exercise === 'string' ? exercise : exercise.title,
+      // If it's a string, determine type from category, otherwise keep existing type
+      type: typeof exercise === 'string' 
+        ? (selectedWorkout.category === 'Bodyweight' 
+            ? 'bodyweight' 
+            : selectedWorkout.category === 'Timed' 
+              ? 'timed' 
+              : 'weight')
+        : exercise.type,
       sets: []
     }));
 
-    localStorage.setItem('currentWorkout', JSON.stringify(formattedExercises));
+    storage.currentWorkout.save(formattedExercises);
     
     navigate('/new-workout', { 
       state: { 
@@ -290,13 +216,13 @@ function SavedPage() {
     switch(option) {
       case 'Recent (Latest)':
         sortedWorkouts.sort((a, b) => 
-          new Date(b.lastDoneDate) - new Date(a.lastDoneDate)
+          new Date(b.lastDoneDate || '1900-01-01') - new Date(a.lastDoneDate || '1900-01-01')
         );
         break;
       
       case 'Recent (Oldest)':
         sortedWorkouts.sort((a, b) => 
-          new Date(a.lastDoneDate) - new Date(b.lastDoneDate)
+          new Date(a.lastDoneDate || '1900-01-01') - new Date(b.lastDoneDate || '1900-01-01')
         );
         break;
       
@@ -317,7 +243,7 @@ function SavedPage() {
     }
     
     setWorkouts(sortedWorkouts);
-    localStorage.setItem('workouts', JSON.stringify(sortedWorkouts));
+    storage.templates.save(sortedWorkouts);
   };
 
   const handleRemoveExercise = (exerciseIndex) => {
@@ -337,14 +263,12 @@ function SavedPage() {
       };
       setSelectedWorkout(updatedWorkout);
       
-      // Update workouts array
       const updatedWorkouts = workouts.map(workout => 
         workout.title === selectedWorkout.title ? updatedWorkout : workout
       );
       setWorkouts(updatedWorkouts);
-      localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+      storage.templates.save(updatedWorkouts);
       
-      // Clear input
       setNewExercise('');
     }
   };
@@ -354,18 +278,15 @@ function SavedPage() {
       const updatedWorkouts = [...workouts];
       const removedWorkout = updatedWorkouts.splice(confirmationModal.workoutIndex, 1)[0];
       
-      // Add to deleted workouts with timestamp
-      const updatedDeletedWorkouts = [{
+      setDeletedWorkouts(prev => [{
         ...removedWorkout,
         deletedAt: new Date().toISOString()
-      }, ...deletedWorkouts].slice(0, 10); // Keep last 10 deleted workouts
+      }, ...prev].slice(0, 10));
       
-      setDeletedWorkouts(updatedDeletedWorkouts);
       setWorkouts(updatedWorkouts);
       
-      // Update both in localStorage
-      localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
-      localStorage.setItem('deletedWorkouts', JSON.stringify(updatedDeletedWorkouts));
+      storage.templates.save(updatedWorkouts);
+      storage.deletedWorkouts.add(removedWorkout);
     } else if (confirmationModal.type === 'exercise') {
       const updatedWorkout = {
         ...selectedWorkout,
@@ -377,83 +298,23 @@ function SavedPage() {
         workout.title === selectedWorkout.title ? updatedWorkout : workout
       );
       setWorkouts(updatedWorkouts);
-      localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
+      storage.templates.save(updatedWorkouts);
     }
     setConfirmationModal({ isOpen: false, type: null, itemToRemove: null, workoutIndex: null });
   };
 
   const handleRecoverWorkout = (workout, index) => {
-    // Add workout back to main list
     const updatedWorkouts = [...workouts, workout];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    setWorkouts(updatedWorkouts);
-    
-    // Remove from deleted workouts
     const updatedDeletedWorkouts = deletedWorkouts.filter((_, i) => i !== index);
+    
+    setWorkouts(updatedWorkouts);
     setDeletedWorkouts(updatedDeletedWorkouts);
     
-    // Update both in localStorage
-    localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
-    localStorage.setItem('deletedWorkouts', JSON.stringify(updatedDeletedWorkouts));
+    storage.templates.save(updatedWorkouts);
+    storage.deletedWorkouts.save(updatedDeletedWorkouts);
   };
 
-  useEffect(() => {
-    const savedDeletedWorkouts = JSON.parse(localStorage.getItem('deletedWorkouts'));
-    if (savedDeletedWorkouts) {
-      setDeletedWorkouts(savedDeletedWorkouts);
-    }
-  }, []);
+  const filteredAndSortedItems = getFilteredAndSortedItems();
 
   return (
     <Container style={{ 
@@ -809,7 +670,9 @@ function SavedPage() {
                     marginBottom: '15px'
                   }}>
                     {item.exercises.map((exercise, i) => (
-                      <li key={i} style={{ padding: '8px 0' }}>{exercise}</li>
+                      <li key={i} style={{ padding: '8px 0' }}>
+                        {typeof exercise === 'string' ? exercise : exercise.title}
+                      </li>
                     ))}
                   </ul>
                   <button

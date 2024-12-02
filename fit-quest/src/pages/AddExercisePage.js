@@ -1,22 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Text, Button, TextInput, Group, Card, ActionIcon } from '@mantine/core';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 import { MdArrowBack, MdAdd } from 'react-icons/md';
+import storage from '../utils/storage';
 
 function AddExercisePage() {
   const navigate = useNavigate();
-
   const [search, setSearch] = useState('');
-  const [recentExercises] = useState(() => {
-    const saved = localStorage.getItem('recentExercises');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [recentExercises, setRecentExercises] = useState([]);
+
+  // Load recent exercises from storage on component mount
+  useEffect(() => {
+    const loadedExercises = storage.recentExercises.getAll();
+    setRecentExercises(loadedExercises);
+  }, []);
 
   const handleAddRecentExercise = (exercise) => {
-    const currentWorkout = JSON.parse(localStorage.getItem('currentWorkout')) || [];
-    localStorage.setItem('currentWorkout', JSON.stringify([...currentWorkout, exercise]));
+    const currentWorkout = storage.currentWorkout.get() || [];
+    const newExercise = {
+      ...exercise,
+      sets: [], // Initialize empty sets for the new exercise
+      id: Date.now() // Add unique identifier
+    };
+    
+    storage.currentWorkout.save([...currentWorkout, newExercise]);
     navigate('/new-workout');
   };
 
@@ -78,10 +87,13 @@ function AddExercisePage() {
               }}
               onClick={() => handleAddRecentExercise(exercise)}
             >
-              <Group position="apart" style={{ padding: '0.3rem' }}>
+              <Group position="apart" style={{ padding: '0.3rem', width: '100%' }}>
                 <MdAdd size={20} style={{ color: 'white' }} />
-                <Text weight={500} size="lg" style={{ fontSize: '16px', fontWeight: '500' }}>
+                <Text weight={500} size="lg" style={{ fontSize: '16px', fontWeight: '500', flex: 1, textAlign: 'left', marginLeft: '1rem' }}>
                   {exercise.title}
+                </Text>
+                <Text size="sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  {exercise.type === 'weight' ? 'Weight' : exercise.type === 'bodyweight' ? 'Bodyweight' : 'Timed'}
                 </Text>
               </Group>
             </Card>

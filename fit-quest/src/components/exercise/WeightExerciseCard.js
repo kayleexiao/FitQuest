@@ -1,30 +1,89 @@
-// components/WeightExerciseCard.js
 import { ActionIcon, Button, Card, Container, Grid, Group, Text, TextInput } from '@mantine/core';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MdAdd, MdChevronRight, MdDelete, MdEdit, MdExpandMore, MdRemoveCircleOutline } from 'react-icons/md';
 
-function WeightExerciseCard({ title = "Exercise", onDelete }) {
+function WeightExerciseCard({ 
+  id,
+  title = "Exercise",  
+  onDelete,
+  onSetsChange,
+  initialSets = []
+}) {
   const [expanded, setExpanded] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [exerciseTitle, setExerciseTitle] = useState(title);
-  const [rows, setRows] = useState([{ id: 1, previous: '-- kg x -- reps' }, { id: 2, previous: '-- kg x -- reps' }, { id: 3, previous: '-- kg x -- reps' }]);
-  const addRow = () => {
-    setRows([...rows, { id: rows.length + 1, previous: '-- kg x -- reps' }]);
+  const [sets, setSets] = useState(initialSets.length > 0 
+    ? initialSets 
+    : [{ setId: Date.now(), reps: '', weight: '', timestamp: Date.now() }]
+  );
+
+  useEffect(() => {
+    if (onSetsChange) {
+      onSetsChange(id, sets);
+    }
+  }, [sets, onSetsChange, id]);
+
+  const addSet = (e) => {
+    e.stopPropagation();
+    const newSet = {
+      setId: Date.now(),
+      reps: '',
+      weight: '',
+      timestamp: Date.now()
+    };
+    setSets([...sets, newSet]);
   };
 
-  const deleteRow = (index) => {
-    const newRows = rows.filter((_, i) => i !== index);
-    setRows(newRows);
+  const removeSet = (index, e) => {
+    e.stopPropagation();
+    const newSets = sets.filter((_, i) => i !== index);
+    setSets(newSets);
   };
 
-  const toggleEditMode = () => {
+  const handleInputChange = (index, field, value) => {
+    // Remove any non-numeric characters
+    const sanitizedValue = field === 'weight' 
+      ? value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')
+      : value.replace(/[^\d]/g, '');
+
+    // Additional validation for decimal places in weight
+    if (field === 'weight' && sanitizedValue.includes('.')) {
+      const [, decimal] = sanitizedValue.split('.');
+      if (decimal && decimal.length > 2) return;
+    }
+
+    // Prevent leading zeros unless it's a decimal
+    if (sanitizedValue.length > 1 && sanitizedValue[0] === '0' && sanitizedValue[1] !== '.') return;
+
+    const newSets = sets.map((set, i) => {
+      if (i === index) {
+        return { 
+          ...set, 
+          [field]: sanitizedValue,
+          timestamp: Date.now()
+        };
+      }
+      return set;
+    });
+
+    setSets(newSets);
+  };
+
+  const toggleEditMode = (e) => {
+    e.stopPropagation();
     setEditMode(!editMode);
   };
 
   const handleExpand = () => {
-    if (expanded && editMode) setEditMode(false); // Exit edit mode when collapsing
+    if (expanded && editMode) setEditMode(false);
     setExpanded(!expanded);
   };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    onDelete();
+  };
+
 
   return (
     <Card shadow="sm" padding="lg" style={{ marginBottom: '2rem', marginTop: '2rem', backgroundColor: '#879DA2', borderRadius: '8px' }}>
@@ -34,6 +93,7 @@ function WeightExerciseCard({ title = "Exercise", onDelete }) {
             value={exerciseTitle}
             onChange={(e) => setExerciseTitle(e.target.value)}
             variant="unstyled"
+            onClick={(e) => e.stopPropagation()}
             styles={{ input: { color: 'white', fontWeight: 500, fontSize: '1.2rem' } }}
             placeholder="Enter exercise title"
           />
@@ -44,10 +104,7 @@ function WeightExerciseCard({ title = "Exercise", onDelete }) {
           {expanded && (
             <ActionIcon
               variant="transparent"
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent collapsing the card when clicking edit
-                toggleEditMode(); // Toggle edit mode on click
-              }}
+              onClick={toggleEditMode}
               style={{ color: editMode ? '#1e90ff' : 'white' }}
             >
               <MdEdit size={24} />
@@ -61,16 +118,14 @@ function WeightExerciseCard({ title = "Exercise", onDelete }) {
 
       {expanded && (
         <Container>
-          {rows.length > 0 && (
+          {sets.length > 0 && (
             <Grid align="center" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
               <Grid.Col span={editMode ? 2.8 : 1}></Grid.Col>
-
-
               <Grid.Col span={5}>
                 <Text color="white" weight={500} align="center">Previous</Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 2 : 3}>
-                <Text color="white" align="center">Rep</Text>
+                <Text color="white" align="center">Reps</Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 2 : 3}>
                 <Text color="white" align="center">KG</Text>
@@ -78,13 +133,13 @@ function WeightExerciseCard({ title = "Exercise", onDelete }) {
             </Grid>
           )}
 
-          {rows.map((row, index) => (
-            <Grid key={index} align="center" gutter="xs" style={{ marginBottom: '1.5rem' }}>
+          {sets.map((set, index) => (
+            <Grid key={set.setId} align="center" gutter="xs" style={{ marginBottom: '1.5rem' }}>
               {editMode && (
                 <Grid.Col span="auto" style={{ textAlign: 'center', maxWidth: 'auto' }}>
                   <ActionIcon
                     variant="transparent"
-                    onClick={() => deleteRow(index)}
+                    onClick={(e) => removeSet(index, e)}
                     style={{ color: 'red' }}
                   >
                     <MdRemoveCircleOutline size={20} />
@@ -95,20 +150,20 @@ function WeightExerciseCard({ title = "Exercise", onDelete }) {
                 <Text color="white" style={{ textAlign: 'left' }}>{index + 1}</Text>
               </Grid.Col>
               <Grid.Col span={5}>
-                <Text color="white" align="center">{row.previous}</Text>
+                <Text color="white" align="center">-- kg × -- reps</Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 2 : 3}>
                 <TextInput
                   placeholder="Reps"
+                  value={set.reps}
+                  onChange={(e) => handleInputChange(index, 'reps', e.target.value)}
                   variant="filled"
-                  type="number" // Only allows numeric input
-
-
+                  onClick={(e) => e.stopPropagation()}
                   styles={{
                     input: {
                       textAlign: 'center',
                       padding: '0.2rem',
-                      backgroundColor: '#879DA2', // Matches card background color
+                      backgroundColor: '#879DA2',
                       color: 'white',
                     },
                   }}
@@ -117,15 +172,15 @@ function WeightExerciseCard({ title = "Exercise", onDelete }) {
               <Grid.Col span={editMode ? 2 : 3}>
                 <TextInput
                   placeholder="KG"
+                  value={set.weight}
+                  onChange={(e) => handleInputChange(index, 'weight', e.target.value)}
                   variant="filled"
-                  type="number" // Only allows numeric input
-
-
+                  onClick={(e) => e.stopPropagation()}
                   styles={{
                     input: {
                       textAlign: 'center',
                       padding: '0.2rem',
-                      backgroundColor: '#879DA2', // Matches card background color
+                      backgroundColor: '#879DA2',
                       color: 'white',
                     },
                   }}
@@ -138,7 +193,7 @@ function WeightExerciseCard({ title = "Exercise", onDelete }) {
             <Group position="center" style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'center' }}>
               <ActionIcon
                 variant="outline"
-                onClick={addRow}
+                onClick={addSet}
                 style={{
                   width: '36px',
                   height: '36px',
@@ -157,9 +212,9 @@ function WeightExerciseCard({ title = "Exercise", onDelete }) {
 
           {editMode && (
             <Button
-                onClick={onDelete}
-                fullWidth
-                style={{
+              onClick={handleDelete}
+              fullWidth
+              style={{
                 marginTop: '1rem',
                 left: '2rem',
                 backgroundColor: 'red',
@@ -167,10 +222,10 @@ function WeightExerciseCard({ title = "Exercise", onDelete }) {
                 fontWeight: 'bold',
                 borderRadius: '10px',
                 width: '15rem'
-                }}
+              }}
             >
-                <MdDelete size={20} style={{ marginRight: '0.5rem' }} />
-                Delete Exercise
+              <MdDelete size={20} style={{ marginRight: '0.5rem' }} />
+              Delete Exercise
             </Button>
           )}
         </Container>
