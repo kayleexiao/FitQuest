@@ -1,6 +1,6 @@
 import { ActionIcon, Button, Container, Group, Text, Modal } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
-import { MdAddCircleOutline, MdEdit, MdDelete } from 'react-icons/md';
+import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 import BodyweightExerciseCard from '../components/exercise/BodyweightExerciseCard';
@@ -333,8 +333,8 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                     color: 'white',
                     borderRadius: '10px',
                     padding: '5px 10px',
-                    fontSize: '12px',
-                    height: '30px'
+                    fontSize: '14px',
+                    height: '36px'
                   }}
                 >
                   Cancel
@@ -348,8 +348,8 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                     color: 'white',
                     borderRadius: '10px',
                     padding: '5px 10px',
-                    fontSize: '12px',
-                    height: '30px'
+                    fontSize: '14px',
+                    height: '36px'
                   }}
                 >
                   Confirm
@@ -366,18 +366,17 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                   fontWeight: 'bold',
                   borderRadius: '10px',
                   width: 'auto',
-                  fontSize: '12px',
-                  height: '30px'
+                  fontSize: '14px',
+                  height: '36px'
                 }}
               >
-                {/* <MdDelete size={20} style={{ marginRight: '0rem' }} /> */}
                 Clear
               </Button>
             )}
           </div>
         </Group>
 
-        <div style={{ marginTop: '1rem' }}>
+        <div style={{ marginTop: '2.5rem' }}>
           {exercises.length > 0 ? (
           exercises.map((exercise) => {
           const key = exercise.id || `${exercise.title}-${Math.random()}`;
