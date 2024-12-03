@@ -121,7 +121,7 @@ const WORKOUT_DATA = {
   }
 };
 
-function ExplorePage() {
+function ExplorePage({ isWorkoutActive }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Weight Lifting');
   const [bookmarkedWorkouts, setBookmarkedWorkouts] = useState({});
@@ -374,8 +374,20 @@ function ExplorePage() {
           })}
         </Box>
 
-        <Navbar />
+        <Navbar isWorkoutInProgress={isWorkoutActive} />
       </Container>
+      <div style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '80px',
+        backgroundColor: 'white',
+        zIndex: 9999,
+        boxShadow: '0 -2px 10px rgba(0,0,0,0.1)'
+      }}>
+        <Navbar isWorkoutInProgress={isWorkoutActive} />
+      </div>
     </div>
   );
 }

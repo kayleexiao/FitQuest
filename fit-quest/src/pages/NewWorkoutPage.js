@@ -9,7 +9,7 @@ import WeightExerciseCard from '../components/exercise/WeightExerciseCard';
 import { useLocation, useNavigate } from 'react-router-dom';
 import storage from '../utils/storage';
 
-function NewWorkoutPage() {
+const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
   const location = useLocation();
   const workoutTemplate = location.state?.workoutTemplate;
   const navigate = useNavigate();
@@ -47,10 +47,21 @@ function NewWorkoutPage() {
   }, [workoutTemplate, location.state]);
 
   const handleFinishWorkout = () => {
+    setIsWorkoutInProgress(false);
     setIsSummaryModalOpen(true);
   };
 
-// Inside NewWorkoutPage.js, in handleCompleteWorkout function
+  const handleStartWorkout = () => {
+    setIsWorkoutInProgress(true);
+  };
+
+  // Call handleStartWorkout when the workout starts
+  useEffect(() => {
+    handleStartWorkout();
+    return () => {
+      setIsWorkoutInProgress(false); // Cleanup on unmount
+    };
+  }, []);
 
   const handleCompleteWorkout = () => {
     try {
@@ -211,7 +222,7 @@ function NewWorkoutPage() {
       </div>
 
       <Container style={{ paddingBottom: '90px', paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
-        <Navbar />
+        <Navbar isWorkoutInProgress={setIsWorkoutInProgress} />
 
         <Group position="apart" style={{ marginTop: '2rem', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
