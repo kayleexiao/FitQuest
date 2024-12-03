@@ -72,19 +72,29 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
         day: '2-digit'
       });
       
-      // Format workout data for history
+      // Get the latest sets data from localStorage for each exercise
+      const updatedExercises = exercises.map(exercise => {
+        const savedSets = localStorage.getItem(`exercise-${exercise.id}-sets`);
+        return {
+          ...exercise,
+          sets: savedSets ? JSON.parse(savedSets) : exercise.sets
+        };
+      });
+      
+      // Format workout data for history with the updated sets
       const workoutHistory = {
         title: workoutTitle || 'Workout',
         date: completionDate,
-        exercises: exercises?.map(exercise => ({
+        exercises: updatedExercises.map(exercise => ({
           title: exercise?.title || 'Exercise',
-          type: exercise?.type,  // Preserve the exercise type
+          type: exercise?.type,
           sets: Array.isArray(exercise?.sets) ? exercise.sets.map(set => ({
             reps: set?.reps || 0,
             weight: set?.weight || 0,
-            time: set?.time || 0
+            time: set?.time || 0,
+            timestamp: set?.timestamp || 0
           })) : []
-        })) || []
+        }))
       };
 
       // Save to history
@@ -213,6 +223,54 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
     return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  // Update the Modal content to use the locally stored data
+  const renderExerciseSets = (exercise) => {
+    const savedSets = localStorage.getItem(`exercise-${exercise.id}-sets`);
+    const exerciseSets = savedSets ? JSON.parse(savedSets) : exercise.sets;
+
+    return (
+      <div style={{ 
+        display: 'grid',
+        gap: '10px'
+      }}>
+        {exerciseSets && exerciseSets.map((set, setIndex) => (
+          <div 
+            key={set.setId || setIndex}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: 'white',
+              padding: '12px 15px',
+              borderRadius: '8px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+            }}
+          >
+            <span style={{ fontWeight: 500 }}>Set {setIndex + 1}</span>
+            <span style={{ color: '#666' }}>
+              {exercise.type === 'weight' && set.weight && set.reps
+                ? `${set.weight}kg × ${set.reps} reps`
+                : exercise.type === 'bodyweight' && set.reps
+                ? `${set.reps} reps`
+                : exercise.type === 'timed' && set.time
+                ? `${formatTime(set.time)}`
+                : 'Not completed'}
+            </span>
+          </div>
+        ))}
+        {(!exerciseSets || exerciseSets.length === 0) && (
+          <div style={{
+            padding: '12px 15px',
+            color: '#666',
+            fontStyle: 'italic'
+          }}>
+            No sets recorded
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -386,35 +444,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                   }}>
                     {exercise.title}
                   </h3>
-                  
-                  <div style={{ 
-                    display: 'grid',
-                    gap: '10px'
-                  }}>
-                    {exercise.sets.map((set, setIndex) => (
-                      <div 
-                        key={setIndex}
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          backgroundColor: 'white',
-                          padding: '12px 15px',
-                          borderRadius: '8px',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                        }}
-                      >
-                        <span style={{ fontWeight: 500 }}>Set {setIndex + 1}</span>
-                        <span style={{ color: '#666' }}>
-                          {exercise.type === 'weight'
-                            ? `${set.weight}kg × ${set.reps} reps`
-                            : exercise.type === 'bodyweight'
-                            ? `${set.reps} reps`
-                            : `${formatTime(set.time)} seconds`}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                  {renderExerciseSets(exercise)}
                 </div>
               ))}
             </div>
