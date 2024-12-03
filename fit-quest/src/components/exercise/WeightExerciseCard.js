@@ -128,7 +128,7 @@ function WeightExerciseCard({
                 <Text color="white" align="center">Reps</Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 2 : 3}>
-                <Text color="white" align="center">KG</Text>
+                <Text color="white" align="center">Weight</Text>
               </Grid.Col>
             </Grid>
           )}
@@ -171,7 +171,7 @@ function WeightExerciseCard({
               </Grid.Col>
               <Grid.Col span={editMode ? 2 : 3}>
                 <TextInput
-                  placeholder="KG"
+                  placeholder="Weight"
                   value={set.weight}
                   onChange={(e) => handleInputChange(index, 'weight', e.target.value)}
                   variant="filled"

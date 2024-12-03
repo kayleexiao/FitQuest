@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Container, ActionIcon } from '@mantine/core';
+import { Container } from '@mantine/core';
 import { MdOutlineExplore, MdAddCircleOutline, MdBookmarkBorder, MdHistory, MdOutlineCalendarMonth   } from "react-icons/md";
 
 function Navbar({ isWorkoutInProgress }) {
