@@ -98,7 +98,7 @@ function CalendarPage() {
         
         {/* Title Section */}
         <Container style={{ paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
-        <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem', marginBottom: '1.5rem' }}>
+        <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem', marginBottom: '0.5rem' }}>
           <Text style={{
             textAlign: 'left',
             fontSize: '3.86vh',
@@ -120,7 +120,7 @@ function CalendarPage() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '2rem'
+            marginBottom: '1.5rem'
           }}
         >
           <MonthMenu onMonthSelect={handleMonthChange} />
@@ -131,7 +131,7 @@ function CalendarPage() {
         <div style={{ 
           display: 'flex', 
           justifyContent: 'center', 
-          marginBottom: '2rem'
+          marginBottom: '1rem'
         }}>
           <Calendar 
             selectedMonth={selectedMonth} 
@@ -148,7 +148,7 @@ function CalendarPage() {
           fontSize: '2.58vh',
           fontWeight: '600',
           color: '#356B77',
-          marginBottom: '1.5rem',
+          marginBottom: '1rem',
           fontStyle: 'italic'
         }}>
           {selectedMonth} {selectedDay || '??'}, {selectedYear}
@@ -157,7 +157,9 @@ function CalendarPage() {
         {/* Workout List */}
         <Container style={{
           padding: '0 10px',
-          marginBottom: '2rem'
+          marginBottom: '2rem',
+          maxHeight: '16vh',
+          overflowY: 'auto'
         }}>
           <WorkoutList 
             items={workouts}

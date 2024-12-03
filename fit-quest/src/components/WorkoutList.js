@@ -43,7 +43,7 @@ const WorkoutList = ({ items, isLoading }) => {
               onClick={() => handleWorkoutClick(item)}
               style={{
                 textAlign: 'left',
-                marginBottom: '10px',
+                marginBottom: '7.5px',
                 padding: '10px',
                 borderRadius: '6px',
                 boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',

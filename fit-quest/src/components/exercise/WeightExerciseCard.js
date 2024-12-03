@@ -16,6 +16,7 @@ function WeightExerciseCard({
     ? initialSets 
     : [{ setId: Date.now(), reps: '', weight: '', timestamp: Date.now() }]
   );
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     const savedSets = localStorage.getItem(`exercise-${id}-sets`);
@@ -49,18 +50,15 @@ function WeightExerciseCard({
   };
 
   const handleInputChange = (index, field, value) => {
-    // Remove any non-numeric characters
     const sanitizedValue = field === 'weight' 
       ? value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')
       : value.replace(/[^\d]/g, '');
 
-    // Additional validation for decimal places in weight
     if (field === 'weight' && sanitizedValue.includes('.')) {
       const [, decimal] = sanitizedValue.split('.');
       if (decimal && decimal.length > 2) return;
     }
 
-    // Prevent leading zeros unless it's a decimal
     if (sanitizedValue.length > 1 && sanitizedValue[0] === '0' && sanitizedValue[1] !== '.') return;
 
     const newSets = sets.map((set, i) => {
@@ -79,19 +77,31 @@ function WeightExerciseCard({
 
   const toggleEditMode = (e) => {
     e.stopPropagation();
+    if (editMode) setConfirmDelete(false);
     setEditMode(!editMode);
   };
 
   const handleExpand = () => {
-    if (expanded && editMode) setEditMode(false);
+    if (expanded && editMode) {
+      setEditMode(false);
+      setConfirmDelete(false); // Reset delete confirmation when collapsing the card
+    }
     setExpanded(!expanded);
   };
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    onDelete();
+    if (confirmDelete) {
+      onDelete();
+    } else {
+      setConfirmDelete(true);
+    }
   };
 
+  const cancelDelete = (e) => {
+    e.stopPropagation();
+    setConfirmDelete(false); // Cancel delete confirmation
+  };
 
   return (
     <Card shadow="sm" padding="lg" style={{ marginBottom: '2rem', marginTop: '2rem', backgroundColor: '#879DA2', borderRadius: '8px' }}>
@@ -148,7 +158,12 @@ function WeightExerciseCard({
                   <ActionIcon
                     variant="transparent"
                     onClick={(e) => removeSet(index, e)}
-                    style={{ color: 'red' }}
+                    style={{
+                      color: sets.length === 1 ? 'grey' : 'red',
+                      cursor: sets.length === 1 ? 'not-allowed' : 'pointer',
+                      backgroundColor: 'transparent'
+                    }}
+                    disabled={sets.length === 1}
                   >
                     <MdRemoveCircleOutline size={20} />
                   </ActionIcon>
@@ -218,23 +233,53 @@ function WeightExerciseCard({
             </Group>
           )}
 
-          {editMode && (
-            <Button
-              onClick={handleDelete}
-              fullWidth
-              style={{
-                marginTop: '1rem',
-                left: '2rem',
-                backgroundColor: 'red',
-                color: 'white',
-                fontWeight: 'bold',
-                borderRadius: '10px',
-                width: '15rem'
-              }}
-            >
-              <MdDelete size={20} style={{ marginRight: '0.5rem' }} />
-              Delete Exercise
-            </Button>
+          {editMode && confirmDelete ? (
+            <Group position="center" style={{ marginTop: '1rem' }}>
+              <Button
+                onClick={handleDelete}
+                style={{
+                  backgroundColor: 'red',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  width: '8rem'
+                }}
+              >
+                Confirm
+              </Button>
+              <Button
+                onClick={cancelDelete}
+                style={{
+                  backgroundColor: 'grey',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  width: '8rem',
+                  marginRight: '1rem'
+                }}
+              >
+                Cancel
+              </Button>
+            </Group>
+          ) : (
+            editMode && (
+              <Button
+                onClick={handleDelete}
+                fullWidth
+                style={{
+                  marginTop: '1rem',
+                  left: '2rem',
+                  backgroundColor: 'red',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  width: '15rem'
+                }}
+              >
+                <MdDelete size={20} style={{ marginRight: '0.5rem' }} />
+                Delete Exercise
+              </Button>
+            )
           )}
         </Container>
       )}

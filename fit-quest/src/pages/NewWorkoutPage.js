@@ -1,6 +1,6 @@
 import { ActionIcon, Button, Container, Group, Text, Modal } from '@mantine/core';
 import React, { useEffect, useState } from 'react';
-import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
+import { MdAddCircleOutline, MdEdit, MdDelete } from 'react-icons/md';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
 import BodyweightExerciseCard from '../components/exercise/BodyweightExerciseCard';
@@ -21,6 +21,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
   const [workoutTitle, setWorkoutTitle] = useState('New Workout');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     if (workoutTemplate) {
@@ -218,6 +219,21 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
     navigate('/add-exercise');
   };
 
+  const handleDeleteWorkout = () => {
+    if (confirmDelete) {
+      storage.currentWorkout.clear();
+      setExercises([]);
+      setWorkoutTitle('New Workout');
+      setConfirmDelete(false);
+    } else {
+      setConfirmDelete(true);
+    }
+  };
+
+  const cancelDeleteWorkout = () => {
+    setConfirmDelete(false); // Revert back to the normal delete button
+  };
+
   const formatTime = (seconds) => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
@@ -306,6 +322,58 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
             >
               <MdEdit size={24} />
             </ActionIcon>
+          </div>
+          <div style={{ position: 'absolute', top: '3.5rem', right: '1rem' }}>
+            {confirmDelete ? (
+              <div style={{ display: 'flex', gap: '4px', flexDirection: 'column' }}>
+                <Button
+                  onClick={() => cancelDeleteWorkout()}
+                  style={{
+                    backgroundColor: 'grey',
+                    color: 'white',
+                    borderRadius: '10px',
+                    padding: '5px 10px',
+                    fontSize: '12px',
+                    height: '30px'
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleDeleteWorkout();
+                  }}
+                  style={{
+                    backgroundColor: 'red',
+                    color: 'white',
+                    borderRadius: '10px',
+                    padding: '5px 10px',
+                    fontSize: '12px',
+                    height: '30px'
+                  }}
+                >
+                  Confirm
+                </Button>
+              </div>
+            ) : (
+              <Button
+                onClick={handleDeleteWorkout}
+                fullWidth
+                style={{
+                  marginTop: '0rem',
+                  backgroundColor: '#356B77',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  width: 'auto',
+                  fontSize: '12px',
+                  height: '30px'
+                }}
+              >
+                {/* <MdDelete size={20} style={{ marginRight: '0rem' }} /> */}
+                Clear
+              </Button>
+            )}
           </div>
         </Group>
 

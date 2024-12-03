@@ -16,6 +16,7 @@ function TimedExerciseCard({
     ? initialSets 
     : [{ setId: Date.now(), time: 0, isActive: false, timestamp: Date.now() }]
   );
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [activeSet, setActiveSet] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
 
@@ -134,18 +135,31 @@ function TimedExerciseCard({
 
   const toggleEditMode = (e) => {
     e.stopPropagation();
+    if (editMode) setConfirmDelete(false);
     setEditMode(!editMode);
   };
 
   const handleExpand = () => {
-    if (expanded && editMode) setEditMode(false);
+    if (expanded && editMode) {
+      setEditMode(false);
+      setConfirmDelete(false);
+    }
     setExpanded(!expanded);
   };
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    setActiveSet(null);
-    onDelete();
+    if (confirmDelete) {
+      onDelete();
+      setActiveSet(null);
+    } else {
+      setConfirmDelete(true);
+    }
+  };
+
+  const cancelDelete = (e) => {
+    e.stopPropagation();
+    setConfirmDelete(false);
   };
 
   return (
@@ -207,7 +221,12 @@ function TimedExerciseCard({
                   <ActionIcon
                     variant="transparent"
                     onClick={(e) => removeSet(index, e)}
-                    style={{ color: 'red' }}
+                    style={{
+                      color: sets.length === 1 ? 'grey' : 'red',
+                      cursor: sets.length === 1 ? 'not-allowed' : 'pointer',
+                      backgroundColor: 'transparent'
+                    }}
+                    disabled={sets.length === 1}
                   >
                     <MdRemoveCircleOutline size={20} />
                   </ActionIcon>
@@ -285,23 +304,53 @@ function TimedExerciseCard({
             </Group>
           )}
 
-          {editMode && (
-            <Button
-              onClick={handleDelete}
-              fullWidth
-              style={{
-                marginTop: '1rem',
-                left: '2rem',
-                backgroundColor: 'red',
-                color: 'white',
-                fontWeight: 'bold',
-                borderRadius: '10px',
-                width: '15rem'
-              }}
-            >
-              <MdDelete size={20} style={{ marginRight: '0.5rem' }} />
-              Delete Exercise
-            </Button>
+{editMode && confirmDelete ? (
+            <Group position="center" style={{ marginTop: '1rem' }}>
+              <Button
+                onClick={handleDelete}
+                style={{
+                  backgroundColor: 'red',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  width: '8rem'
+                }}
+              >
+                Confirm
+              </Button>
+              <Button
+                onClick={cancelDelete}
+                style={{
+                  backgroundColor: 'grey',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  width: '8rem',
+                  marginRight: '1rem'
+                }}
+              >
+                Cancel
+              </Button>
+            </Group>
+          ) : (
+            editMode && (
+              <Button
+                onClick={handleDelete}
+                fullWidth
+                style={{
+                  marginTop: '1rem',
+                  left: '2rem',
+                  backgroundColor: 'red',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  borderRadius: '10px',
+                  width: '15rem'
+                }}
+              >
+                <MdDelete size={20} style={{ marginRight: '0.5rem' }} />
+                Delete Exercise
+              </Button>
+            )
           )}
         </Container>
       )}
