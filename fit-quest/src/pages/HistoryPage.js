@@ -146,7 +146,8 @@ function HistoryPage() {
                     <Text style={{ 
                       color: 'white',
                       fontSize: '24px',
-                      fontWeight: 'bold'
+                      fontWeight: 'bold',
+                      marginLeft: '25vw'
                     }}>
                       ›
                     </Text>

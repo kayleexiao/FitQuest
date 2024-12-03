@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IoIosArrowDropdown } from 'react-icons/io';
 
 const YearMenu = ({ onYearSelect }) => {
-    const years = ['2020', '2021', '2022', '2023', '2024'];
+    const years = ['2020', '2021', '2022', '2023', '2024', '2025'];
     const currentYear = new Date().getFullYear().toString();
     const [selectedYear, setSelectedYear] = useState(
       years.includes(currentYear) ? currentYear : years[0]

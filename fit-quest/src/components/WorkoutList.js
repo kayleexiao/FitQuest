@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Text } from '@mantine/core';
 
 const WorkoutList = ({ items, isLoading }) => {
   const navigate = useNavigate();
@@ -51,9 +52,21 @@ const WorkoutList = ({ items, isLoading }) => {
                 color: 'white',
                 borderColor: 'white',
                 cursor: 'pointer',
+                position: 'relative',
               }}
             >
               {formatWorkoutContent(item)}
+              <Text style={{
+                position: 'absolute',
+                top: '50%',
+                right: '10px',
+                transform: 'translateY(-50%)',
+                color: 'white',
+                fontSize: '24px',
+                fontWeight: 'bold',
+              }}>
+                ›
+              </Text>
             </div>
           ))
         ) : (

@@ -284,7 +284,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
 
         <Group position="apart" style={{ marginTop: '2rem', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+            <div style={{ flex: 0.7, display: 'flex', alignItems: 'center' }}>
               {isEditingTitle ? (
                 <input
                   type="text"
