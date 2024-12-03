@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'; 
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
-import { Container } from '@mantine/core';
+import { Container, Group, Text } from '@mantine/core';
 import MonthMenu from '../components/MonthMenu';
 import YearMenu from '../components/YearMenu';
 import WorkoutList from '../components/WorkoutList';
@@ -89,97 +89,85 @@ function CalendarPage() {
   };
 
   return (
-    <Container>
-      <Navbar />
-      <Statusbar />
-      {/* Title */}
-      <Container
-        fluid
-        style={{
-          position: 'fixed',
-          top: '5.36vh',
-          left: 0, 
-          backgroundColor: 'rgba(0,0,0,0)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '0 10vw',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-          <span style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650, marginRight: '1vw' }}>
+    <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1, maxWidth: '100%', margin: 'auto', backgroundColor: '#fff' }}>
+        <Statusbar />
+      </div>
+
+        <Navbar />
+        
+        {/* Title Section */}
+        <Container style={{ paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
+        <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem', marginBottom: '1.5rem' }}>
+          <Text style={{
+            textAlign: 'left',
+            fontSize: '3.86vh',
+            color: '#356B77',
+            fontWeight: 650,
+            margin: 0,
+            padding: 0,
+          }}>
             <i>Calendar</i>
-          </span>
-        </div>
+          </Text>
+        </Group>
       </Container>
-
-      {/* Selected Date Display */}
-      <div style={{
-        position: 'fixed',
-        top: '65vh',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        fontSize: '2.58vh',
-        fontWeight: '600',
-        color: '#356B77',
-        textAlign: 'center',
-        width: '100%',
-      }}>
-        <i>{selectedMonth} {selectedDay || '??'}, {selectedYear}</i>
-      </div>
-
-      {/* Workout List */}
-      <div style={{
-        position: 'fixed',
-        flexDirection: 'column',
-        top: '75vh',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        height: '15vh',
-        width: '80%',
-        overflowY: 'auto',
-        borderRadius: '10px'
-      }}>
-        <WorkoutList 
-          items={workouts} // Pass the full workout objects instead of just formatted strings
-          isLoading={loading}
-        />
-      </div>
-
-      {/* Calendar */}
-      <div style={{ marginTop: '18vh', display: 'flex', justifyContent: 'center', position: 'fixed', left: '50%', transform: 'translate(-50%, 0%)' }}>
-        <Calendar 
-          selectedMonth={selectedMonth} 
-          selectedYear={selectedYear}
-          selectedDay={selectedDay}
-          onDayClick={handleDayChange}
-          workoutDates={getWorkoutDates()}
-        />
-      </div>
 
       {/* Month/Year Selection */}
-      <Container
-        fluid
-        style={{
-          position: 'fixed',
-          top: '12.88vh',
-          left: 0,
-          right: 0,
-          backgroundColor: 'rgba(0,0,0,0)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '0 10vw',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+      <Container style={{ paddingBottom: '90px', paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
+        <Container
+          style={{
+            padding: '0 10px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '2rem'
+          }}
+        >
           <MonthMenu onMonthSelect={handleMonthChange} />
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
           <YearMenu onYearSelect={handleYearChange} />
+        </Container>
+
+        {/* Calendar */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          marginBottom: '2rem'
+        }}>
+          <Calendar 
+            selectedMonth={selectedMonth} 
+            selectedYear={selectedYear}
+            selectedDay={selectedDay}
+            onDayClick={handleDayChange}
+            workoutDates={getWorkoutDates()}
+          />
         </div>
+
+        {/* Selected Date Display */}
+        <div style={{
+          textAlign: 'center',
+          fontSize: '2.58vh',
+          fontWeight: '600',
+          color: '#356B77',
+          marginBottom: '1.5rem',
+          fontStyle: 'italic'
+        }}>
+          {selectedMonth} {selectedDay || '??'}, {selectedYear}
+        </div>
+
+        {/* Workout List */}
+        <Container style={{
+          padding: '0 10px',
+          marginBottom: '2rem'
+        }}>
+          <WorkoutList 
+            items={workouts}
+            isLoading={loading}
+          />
+        </Container>
       </Container>
-    </Container>
+
+      <Navbar />
+    </div>
   );
 }
 
