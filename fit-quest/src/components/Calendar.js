@@ -73,13 +73,25 @@ const Calendar = ({ selectedMonth, selectedYear, selectedDay, onDayClick, workou
             {hasWorkout && !isSelected && (
               <div style={{
                 position: 'absolute',
-                bottom: '2px',
+                bottom: '5px',
                 left: '50%',
                 transform: 'translateX(-50%)',
                 width: '4px',
                 height: '4px',
                 borderRadius: '50%',
-                backgroundColor: '#5FB7CD',
+                backgroundColor: '#356B77',
+              }} />
+            )}
+            {hasWorkout && isSelected && (
+              <div style={{
+                position: 'absolute',
+                bottom: '5px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '4px',
+                height: '4px',
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
               }} />
             )}
           </div>

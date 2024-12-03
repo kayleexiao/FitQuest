@@ -18,9 +18,17 @@ function WeightExerciseCard({
   );
 
   useEffect(() => {
+    const savedSets = localStorage.getItem(`exercise-${id}-sets`);
+    if (savedSets) {
+      setSets(JSON.parse(savedSets));
+    }
+  }, [id]);
+
+  useEffect(() => {
     if (onSetsChange) {
       onSetsChange(id, sets);
     }
+    localStorage.setItem(`exercise-${id}-sets`, JSON.stringify(sets));
   }, [sets, onSetsChange, id]);
 
   const addSet = (e) => {

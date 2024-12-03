@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Text, Group, Card, Box } from '@mantine/core';
+import { Container, Text, Group, Card, Box, Button } from '@mantine/core';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
-import { MdStar, MdStarBorder } from 'react-icons/md';
+import { MdStar, MdStarBorder, MdLogout } from 'react-icons/md';
 import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import storage from '../utils/storage';
@@ -220,6 +220,21 @@ function ExplorePage({ isWorkoutActive }) {
             }}>
               <i>Hello User!</i>
             </Text>
+            <Button
+              variant="filled"
+              style={{
+                backgroundColor: '#356B77',
+                color: 'white',
+                fontSize: '24px',
+                fontWeight: 500,
+                borderRadius: '3px',
+                marginLeft: '25vw',
+                width: '14vw'
+              }}
+              onClick={() => navigate('/')}
+            >
+              <MdLogout/>
+            </Button>
             <Text style={{
               color: '#356B77',
               fontSize: '18px',
