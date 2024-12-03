@@ -16,7 +16,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
 
   const [exercises, setExercises] = useState(() => {
     const savedExercises = storage.currentWorkout.get();
-    return savedExercises || [];
+    return Array.isArray(savedExercises) ? savedExercises : [];
   });
   const [workoutTitle, setWorkoutTitle] = useState('New Workout');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -25,8 +25,9 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
   useEffect(() => {
     if (workoutTemplate) {
       setWorkoutTitle(workoutTemplate.title);
-      // Ensure each exercise has an id
-      const exercisesWithIds = workoutTemplate.exercises.map(exercise => ({
+      // Ensure exercises is an array before mapping
+      const exercises = Array.isArray(workoutTemplate.exercises) ? workoutTemplate.exercises : [];
+      const exercisesWithIds = exercises.map(exercise => ({
         ...exercise,
         id: exercise.id || Date.now() + Math.random()
       }));
@@ -34,8 +35,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
       storage.currentWorkout.save(exercisesWithIds);
     } else {
       const returnedExercises = location.state?.exercises;
-      if (returnedExercises) {
-        // Ensure each exercise has an id
+      if (Array.isArray(returnedExercises)) {
         const exercisesWithIds = returnedExercises.map(exercise => ({
           ...exercise,
           id: exercise.id || Date.now() + Math.random()
