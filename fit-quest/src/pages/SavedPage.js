@@ -323,6 +323,7 @@ function SavedPage() {
   const filteredAndSortedItems = getFilteredAndSortedItems();
 
   return (
+    <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
     <Container style={{ 
       padding: 0,
       minHeight: '100vh',
@@ -332,19 +333,9 @@ function SavedPage() {
       <Navbar isWorkoutInProgress={isWorkoutActive} />
       
       {/* Fixed Statusbar */}
-      <Container
-        fluid
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 9998,  // Just below navbar
-          backgroundColor: 'white'
-        }}
-      >
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1, maxWidth: '100%', margin: 'auto', backgroundColor: '#fff' }}>
         <Statusbar />
-      </Container>
+      </div>
 
       {/* Fixed Header Section */}
       <Container
@@ -392,7 +383,6 @@ function SavedPage() {
           <div />
         </Container>
 
-        {/* Fixed Search Bar */}
         <Container 
           fluid
           style={{ 
@@ -402,7 +392,7 @@ function SavedPage() {
             gap: '10px'
           }}
         >
-          <div style={{ 
+          <div style={{
             position: 'relative',
             flex: 1,
             display: 'flex',
@@ -511,7 +501,7 @@ function SavedPage() {
                 onClick={() => toggleItem(index)}
                 style={{
                   width: '100%',
-                  backgroundColor: '#9AB7BF',
+                  backgroundColor: '#879DA1',
                   borderRadius: expandedItems[index] ? '25px 25px 0 0' : 25,
                   padding: '15px 12px',
                   marginBottom: expandedItems[index] ? 0 : 10,
@@ -614,20 +604,6 @@ function SavedPage() {
                             Rename
                           </button>
                           <button
-                            onClick={(e) => handleEdit(e, index, item)}
-                            style={{
-                              padding: '8px 15px',
-                              background: 'none',
-                              border: 'none',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              color: '#356B77',
-                              fontSize: '14px',
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button
                             onClick={(e) => handleRemove(e, index)}
                             style={{
                               padding: '8px 15px',
@@ -652,7 +628,7 @@ function SavedPage() {
                 <div 
                   onClick={() => setExpandedItems(prev => ({...prev, [index]: false}))}  // Add click handler
                   style={{
-                    backgroundColor: '#9AB7BF',
+                    backgroundColor: '#879DA1',
                     borderRadius: '0 0 25px 25px',
                     padding: '15px 12px',
                     marginBottom: 10,
@@ -1059,6 +1035,7 @@ function SavedPage() {
       </Modal>
 
     </Container>
+    </div>
   );
 }
 
