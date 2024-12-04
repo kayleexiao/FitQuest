@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ActionIcon, Button, Card, Container, Grid, Group, Text, TextInput } from '@mantine/core';
+import { ActionIcon, Button, Card, Container, Grid, Group, Text, TextInput, Textarea } from '@mantine/core';
 import { MdAdd, MdChevronRight, MdDelete, MdEdit, MdExpandMore, MdRemoveCircleOutline } from 'react-icons/md';
 
 function TimedExerciseCard({ 
@@ -15,6 +15,7 @@ function TimedExerciseCard({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [activeSet, setActiveSet] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
+  const [notes, setNotes] = useState('');
 
   const [sets, setSets] = useState(() => {
     const savedSets = localStorage.getItem(`exercise-${id}-sets`);
@@ -43,13 +44,21 @@ function TimedExerciseCard({
     return () => clearInterval(interval);
   }, [activeSet, currentTime]);
 
+  useEffect(() => {
+    const savedNotes = localStorage.getItem(`exercise-${id}-notes`);
+    if (savedNotes) {
+      setNotes(savedNotes);
+    }
+  }, [id]);
+
   // Save to localStorage effect - separate from timer effect
   useEffect(() => {
     if (onSetsChange) {
       onSetsChange(id, sets);
     }
     localStorage.setItem(`exercise-${id}-sets`, JSON.stringify(sets));
-  }, [sets, onSetsChange, id]);
+    localStorage.setItem(`exercise-${id}-notes`, notes);
+  }, [sets, notes, onSetsChange, id]);
 
   const formatTime = (seconds) => {
     const hrs = Math.floor(seconds / 3600);
@@ -289,6 +298,45 @@ function TimedExerciseCard({
               </Grid.Col>
             </Grid>
           ))}
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <Text color="white" style={{ textAlign: 'left' }}>Notes</Text>
+            <Button
+              onClick={() => setNotes('')}
+              style={{
+                backgroundColor: 'transparent',
+                color: 'white',
+                fontWeight: '400',
+                borderRadius: '8px',
+                padding: '0.5rem 0.5rem',
+                fontSize: '1rem',
+                borderStyle: 'solid',
+                borderColor: 'white'
+              }}
+            >
+              Clear Notes
+            </Button>
+          </div>
+          <div>
+            <Textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Enter notes here"
+              autosize
+              minRows={2}
+              maxRows={10}
+              variant="filled"
+              styles={{
+                input: {
+                  padding: '0.5rem',
+                  backgroundColor: 'white',
+                  color: '#356B77',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                },
+              }}
+            />
+          </div>
 
           {!editMode && (
             <Group position="center" style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'center' }}>

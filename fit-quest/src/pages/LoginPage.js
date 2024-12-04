@@ -1,8 +1,10 @@
 import { Container } from '@mantine/core';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from "react-icons/md";
 import LoginRegister from '../components/LoginRegister';
 import Statusbar from '../components/StatusBar';
+import { useNavigate } from 'react-router-dom';
+import { UserContext } from "../UserContext";
 
 function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,6 +15,9 @@ function LoginPage() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const { setUser } = useContext(UserContext);
+  const navigate = useNavigate(); 
 
   const toggleView = () => {
     setIsLogin(!isLogin);
@@ -52,20 +57,32 @@ function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
   
-
   const handleButtonClick = (e) => {
     e.preventDefault();
     if (validateFields()) {
-      window.location.href = '/explore';
+      if (isLogin) {
+        const user = testCredentials.find(
+          (cred) => cred.email === email && cred.password === password
+        );
+        if (user) {
+          setUser({ firstName: user.firstName });
+          navigate('/explore');
+        }
+      } else {
+        setUser({ firstName: username });
+        navigate('/explore');
+      }
     }
   };
 
   const testCredentials = [
-    { email: 'email', password: 'password' },
-    { email: 'test', password: '1234' },
-    { email: 'login', password: 'page' },
+    { email: 'email', password: 'password', firstName: 'Ethan' },
+    { email: 'test', password: '1234', firstName: 'Tiffany' },
+    { email: 'login', password: 'page', firstName: 'Leo' },
+    { email: 'cardio', password: 'beginner', firstName: 'Kody' },
+    { email: 'cyclist', password: 'experienced', firstName: 'Mia' },
   ];
-  
+
 
   return (
     <Container>

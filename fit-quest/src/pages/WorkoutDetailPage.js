@@ -98,6 +98,12 @@ function WorkoutDetailPage() {
                 </Text>
               </Group>
             ))}
+            <Text weight={500} style={{ color: 'white', marginBottom: '10px' }}>
+              {'Notes'}
+            </Text>
+            <Text weight={500} style={{ color: 'white', marginBottom: '10px' }}> {/* Not sure how to get the notes section to work */}
+              {exercise.notes}
+            </Text>
           </Card>
         ))}
       </Container>

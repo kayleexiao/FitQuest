@@ -5,7 +5,7 @@ import { MdOutlineExplore, MdAddCircleOutline, MdBookmarkBorder, MdHistory, MdOu
 
 function Navbar({ isWorkoutInProgress }) {
   const location = useLocation();
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname.startsWith(path);
 
   return (
     <Container

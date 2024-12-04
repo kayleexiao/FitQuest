@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Container, Text, Group, Card, Box, Button } from '@mantine/core';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
@@ -6,6 +6,7 @@ import { MdStar, MdStarBorder, MdLogout } from 'react-icons/md';
 import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import storage from '../utils/storage';
+import { UserContext } from '../UserContext';
 
 const WORKOUT_DATA = {
   'Weight Lifting': {
@@ -192,7 +193,7 @@ function ExplorePage({ isWorkoutActive }) {
 
   const handleWorkoutClick = (category, workoutKey) => {
     const workoutData = WORKOUT_DATA[category][workoutKey];
-    navigate('/workout', { 
+    navigate('/explore/workout', { 
       state: { 
         workout: {
           ...workoutData,
@@ -201,13 +202,32 @@ function ExplorePage({ isWorkoutActive }) {
       }
     });
   };
-  
+
+  const { user } = useContext(UserContext);
+
   return (
     <div style={{ position: 'relative', maxWidth: '100%', margin: 'auto' }}>
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1, maxWidth: '100%', margin: 'auto', backgroundColor: '#fff' }}>
         <Statusbar />
       </div>
       <Container style={{ paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
+        <Button
+          variant="filled"
+          style={{
+            position: 'absolute',
+            backgroundColor: '#356B77',
+            color: 'white',
+            fontSize: '24px',
+            fontWeight: 500,
+            borderRadius: '3px',
+            width: '14vw',
+            marginLeft: '29vw',
+            marginTop: '4.5vh'
+          }}
+          onClick={() => navigate('/')}
+        >
+          <MdLogout/>
+        </Button>
         <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem', marginBottom: '1rem', gap: 0 }}>
           <Group align="center" style={{ gap: '10px' }}>
             <Text style={{
@@ -217,24 +237,11 @@ function ExplorePage({ isWorkoutActive }) {
               fontWeight: 650,
               margin: 0,
               padding: 0,
+              maxWidth: '72.5vw',
+              overflowX: 'scroll'
             }}>
-              <i>Hello User!</i>
+              <i>Hello {user.firstName ? user.firstName : "User"}!</i>
             </Text>
-            <Button
-              variant="filled"
-              style={{
-                backgroundColor: '#356B77',
-                color: 'white',
-                fontSize: '24px',
-                fontWeight: 500,
-                borderRadius: '3px',
-                marginLeft: '25vw',
-                width: '14vw'
-              }}
-              onClick={() => navigate('/')}
-            >
-              <MdLogout/>
-            </Button>
             <Text style={{
               color: '#356B77',
               fontSize: '18px',
