@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
-import { Container, TextInput, UnstyledButton, Modal } from '@mantine/core';
+import { Container, TextInput, UnstyledButton, Modal, Text, Group } from '@mantine/core';
 import { IoSearchOutline, IoFilterOutline } from 'react-icons/io5';
 import { FaTrashRestore } from 'react-icons/fa';
 import { BsThreeDots } from "react-icons/bs";
@@ -352,35 +352,19 @@ function SavedPage() {
         }}
       >
         {/* Saved Title */}
-        <Container
-          fluid
-          style={{
-            backgroundColor: 'rgba(0,0,0,0)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            height: isScrolled ? '40px' : '60px',
-            transition: 'all 0.3s ease',
-            padding: '0 2px',
-          }}
-        >
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'flex-start', 
-            marginLeft: '2px'
-          }}>
-            <span style={{ 
+        <Container style={{ paddingTop: '7.5px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
+          <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '0rem', marginBottom: '0rem' }}>
+            <Text style={{
+              textAlign: 'left',
               fontSize: '3.86vh',
-              color: '#356B77', 
+              color: '#356B77',
               fontWeight: 650,
-              letterSpacing: '0.1rem',
-              marginRight: '10px',
-              fontStyle: 'italic',
-              transition: 'all 0.3s ease',
-            }}>Saved</span>
-          </div>
-          <div />
+              margin: 0,
+              padding: 0,
+            }}>
+              <i>Saved</i>
+            </Text>
+          </Group>
         </Container>
 
         <Container 
