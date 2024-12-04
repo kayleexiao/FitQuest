@@ -26,7 +26,6 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
   useEffect(() => {
     if (workoutTemplate) {
       setWorkoutTitle(workoutTemplate.title);
-      // Ensure exercises is an array before mapping
       const exercises = Array.isArray(workoutTemplate.exercises) ? workoutTemplate.exercises : [];
       const exercisesWithIds = exercises.map(exercise => ({
         ...exercise,
@@ -47,22 +46,23 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
     }
   }, [workoutTemplate, location.state]);
 
+  useEffect(() => {
+    if (setIsWorkoutInProgress) {
+      setIsWorkoutInProgress(true);
+    }
+    return () => {
+      if (setIsWorkoutInProgress) {
+        setIsWorkoutInProgress(false);
+      }
+    };
+  }, [setIsWorkoutInProgress]);
+
   const handleFinishWorkout = () => {
-    setIsWorkoutInProgress(false);
+    if (setIsWorkoutInProgress) {
+      setIsWorkoutInProgress(false);
+    }
     setIsSummaryModalOpen(true);
   };
-
-  const handleStartWorkout = () => {
-    setIsWorkoutInProgress(true);
-  };
-
-  // Call handleStartWorkout when the workout starts
-  useEffect(() => {
-    handleStartWorkout();
-    return () => {
-      setIsWorkoutInProgress(false); // Cleanup on unmount
-    };
-  }, []);
 
   const handleCompleteWorkout = () => {
     try {
@@ -112,7 +112,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
               lastDoneDate: formattedDate,
               exercises: exercises.map(exercise => ({
                 title: exercise.title,
-                type: exercise.type  // Preserve the exercise type when updating template
+                type: exercise.type
               }))
             };
           }
@@ -125,7 +125,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
           title: workoutTitle,
           exercises: exercises.map(exercise => ({
             title: exercise.title,
-            type: exercise.type  // Preserve the exercise type when creating new template
+            type: exercise.type
           })),
           lastDoneDate: formattedDate,
           createdAt: new Date().toISOString()
@@ -231,7 +231,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
   };
 
   const cancelDeleteWorkout = () => {
-    setConfirmDelete(false); // Revert back to the normal delete button
+    setConfirmDelete(false);
   };
 
   const formatTime = (seconds) => {
@@ -241,7 +241,6 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
     return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  // Update the Modal content to use the locally stored data
   const renderExerciseSets = (exercise) => {
     const savedSets = localStorage.getItem(`exercise-${exercise.id}-sets`);
     const exerciseSets = savedSets ? JSON.parse(savedSets) : exercise.sets;
