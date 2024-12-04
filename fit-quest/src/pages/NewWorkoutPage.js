@@ -401,6 +401,9 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                 id={exercise.id}
                 title={exercise.title}
                 sets={exercise.sets || []}
+                onRepsChange={(setIndex, newReps) => handleRepsChange(exercise.id, setIndex, newReps)}
+                onAddSet={() => handleAddSet(exercise.id)}
+                onRemoveSet={(setIndex) => handleRemoveSet(exercise.id, setIndex)}
                 onDelete={() => handleDeleteExercise(exercise.id)}
               />
             );
@@ -411,6 +414,23 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                 id={exercise.id}
                 title={exercise.title}
                 sets={exercise.sets || []}
+                onTimeChange={(setIndex, newTime) => {
+                  const updatedExercises = exercises.map(ex => {
+                    if (ex.id === exercise.id) {
+                      const updatedSets = [...(ex.sets || [])];
+                      if (!updatedSets[setIndex]) {
+                        updatedSets[setIndex] = {};
+                      }
+                      updatedSets[setIndex] = { ...updatedSets[setIndex], time: newTime };
+                      return { ...ex, sets: updatedSets };
+                    }
+                    return ex;
+                  });
+                  setExercises(updatedExercises);
+                  storage.currentWorkout.save(updatedExercises);
+                }}
+                onAddSet={() => handleAddSet(exercise.id)}
+                onRemoveSet={(setIndex) => handleRemoveSet(exercise.id, setIndex)}
                 onDelete={() => handleDeleteExercise(exercise.id)}
               />
             );

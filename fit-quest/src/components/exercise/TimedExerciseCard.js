@@ -12,14 +12,21 @@ function TimedExerciseCard({
   const [expanded, setExpanded] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [exerciseTitle, setExerciseTitle] = useState(title);
-  const [sets, setSets] = useState(initialSets.length > 0 
-    ? initialSets 
-    : [{ setId: Date.now(), time: 0, isActive: false, timestamp: Date.now() }]
-  );
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [activeSet, setActiveSet] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
 
+  const [sets, setSets] = useState(() => {
+    const savedSets = localStorage.getItem(`exercise-${id}-sets`);
+    if (savedSets) {
+      return JSON.parse(savedSets);
+    }
+    return initialSets.length > 0 
+      ? initialSets 
+      : [{ setId: Date.now(), time: 0, isActive: false, timestamp: Date.now() }];
+  });
+
+  // Timer effect
   useEffect(() => {
     let interval;
     if (activeSet !== null) {
@@ -36,10 +43,12 @@ function TimedExerciseCard({
     return () => clearInterval(interval);
   }, [activeSet, currentTime]);
 
+  // Save to localStorage effect - separate from timer effect
   useEffect(() => {
     if (onSetsChange) {
       onSetsChange(id, sets);
     }
+    localStorage.setItem(`exercise-${id}-sets`, JSON.stringify(sets));
   }, [sets, onSetsChange, id]);
 
   const formatTime = (seconds) => {
@@ -202,13 +211,13 @@ function TimedExerciseCard({
           {sets.length > 0 && (
             <Grid align="center" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
               {editMode && <Grid.Col span={2}></Grid.Col>}
-              <Grid.Col span={1}>
+              <Grid.Col span={2}>
                 <Text color="white" align="left"></Text>
               </Grid.Col>
-              <Grid.Col span={6}>
+              <Grid.Col span={editMode ? 4 : 4}>
                 <Text color="white" weight={500} align="center">Previous</Text>
               </Grid.Col>
-              <Grid.Col span={editMode ? 4 : 1}>
+              <Grid.Col span={editMode ? 3 : 6}>
                 <Text color="white" align="center">Time</Text>
               </Grid.Col>
             </Grid>
@@ -222,11 +231,9 @@ function TimedExerciseCard({
                     variant="transparent"
                     onClick={(e) => removeSet(index, e)}
                     style={{
-                      color: sets.length === 1 ? 'grey' : 'red',
-                      cursor: sets.length === 1 ? 'not-allowed' : 'pointer',
+                      color: 'red',
                       backgroundColor: 'transparent'
                     }}
-                    disabled={sets.length === 1}
                   >
                     <MdRemoveCircleOutline size={20} />
                   </ActionIcon>
@@ -235,7 +242,7 @@ function TimedExerciseCard({
               <Grid.Col span={1}>
                 <Text color="white" style={{ textAlign: 'left' }}>{index + 1}</Text>
               </Grid.Col>
-              <Grid.Col span={5}>
+              <Grid.Col span={editMode ? 5 : 6}>
                 <Text color="white" align="center">--:--:--</Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 4 : 5}>

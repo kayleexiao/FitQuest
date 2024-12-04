@@ -14,15 +14,21 @@ function BodyweightExerciseCard({
   const [exerciseTitle, setExerciseTitle] = useState(title);
   const [confirmDelete, setConfirmDelete] = useState(false);
   
-  const [sets, setSets] = useState(initialSets.length > 0 
-    ? initialSets 
-    : [{ setId: Date.now(), reps: '', timestamp: Date.now() }]
-  );
+  const [sets, setSets] = useState(() => {
+    const savedSets = localStorage.getItem(`exercise-${id}-sets`);
+    if (savedSets) {
+      return JSON.parse(savedSets);
+    }
+    return initialSets.length > 0 
+      ? initialSets 
+      : [{ setId: Date.now(), reps: '', timestamp: Date.now() }];
+  });
 
   useEffect(() => {
     if (onSetsChange) {
       onSetsChange(id, sets);
     }
+    localStorage.setItem(`exercise-${id}-sets`, JSON.stringify(sets));
   }, [sets, onSetsChange, id]);
 
   const addSet = (e) => {
@@ -126,7 +132,7 @@ function BodyweightExerciseCard({
               <Grid.Col span={6}>
                 <Text color="white" weight={500} align="center">Previous</Text>
               </Grid.Col>
-              <Grid.Col span={editMode ? 2 : 5}>
+              <Grid.Col span={editMode ? 3: 5}>
                 <Text color="white" align="center">Reps</Text>
               </Grid.Col>
             </Grid>
@@ -139,8 +145,7 @@ function BodyweightExerciseCard({
                   <ActionIcon
                     variant="transparent"
                     onClick={(e) => removeSet(index, e)}
-                    style={{ color: sets.length === 1 ? 'grey' : 'red', cursor: sets.length === 1 ? 'not-allowed' : 'pointer', backgroundColor: 'transparent' }}
-                    disabled={sets.length === 1}
+                    style={{ color:'red', backgroundColor: 'transparent' }}
                   >
                     <MdRemoveCircleOutline size={20} />
                   </ActionIcon>
@@ -152,7 +157,7 @@ function BodyweightExerciseCard({
               <Grid.Col span={6}>
                 <Text color="white" align="center">-- reps</Text>
               </Grid.Col>
-              <Grid.Col span={editMode ? 2 : 5}>
+              <Grid.Col span={editMode ? 3 : 5}>
                 <TextInput
                   placeholder="Reps"
                   value={set.reps}
@@ -234,7 +239,7 @@ function BodyweightExerciseCard({
                   borderRadius: '10px'
                 }}
               >
-                <MdDelete size={20} style={{ marginRight: '0.5rem' }} />
+                <MdDelete size={20} style={{ marginRight: '0.5rem', color: 'red' }} />
                 Delete Exercise
               </Button>
             )

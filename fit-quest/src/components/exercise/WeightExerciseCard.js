@@ -159,11 +159,9 @@ function WeightExerciseCard({
                     variant="transparent"
                     onClick={(e) => removeSet(index, e)}
                     style={{
-                      color: sets.length === 1 ? 'grey' : 'red',
-                      cursor: sets.length === 1 ? 'not-allowed' : 'pointer',
+                      color: 'red',
                       backgroundColor: 'transparent'
                     }}
-                    disabled={sets.length === 1}
                   >
                     <MdRemoveCircleOutline size={20} />
                   </ActionIcon>
