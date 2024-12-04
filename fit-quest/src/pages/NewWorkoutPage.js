@@ -24,6 +24,22 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
+    const savedTitle = localStorage.getItem('currentWorkoutTitle');
+    if (savedTitle) {
+      setWorkoutTitle(savedTitle);
+    } else if (workoutTemplate?.title) {
+      setWorkoutTitle(workoutTemplate.title);
+      localStorage.setItem('currentWorkoutTitle', workoutTemplate.title);
+    }
+  }, [workoutTemplate]);
+  
+  const handleTitleChange = (e) => {
+    const newTitle = e.target.value;
+    setWorkoutTitle(newTitle);
+    localStorage.setItem('currentWorkoutTitle', newTitle);
+  };
+
+  useEffect(() => {
     if (workoutTemplate) {
       setWorkoutTitle(workoutTemplate.title);
       const exercises = Array.isArray(workoutTemplate.exercises) ? workoutTemplate.exercises : [];
@@ -135,12 +151,13 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
 
       // Clear current workout
       storage.currentWorkout.clear();
+      localStorage.removeItem('currentWorkoutTitle');
       
       // Reset state
       setExercises([]);
-      setWorkoutTitle('');
+      setWorkoutTitle('New Workout');
       setIsSummaryModalOpen(false);
-      
+
       // Navigate to history page
       navigate('/history');
     } catch (error) {
@@ -216,12 +233,14 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
 
   const handleAddExercise = () => {
     storage.currentWorkout.save(exercises);
+    localStorage.setItem('currentWorkoutTitle', workoutTitle);
     navigate('/add-exercise');
   };
 
   const handleDeleteWorkout = () => {
     if (confirmDelete) {
       storage.currentWorkout.clear();
+      localStorage.removeItem('currentWorkoutTitle');
       setExercises([]);
       setWorkoutTitle('New Workout');
       setConfirmDelete(false);
@@ -302,12 +321,12 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
             <div style={{ flex: 0.7, display: 'flex', alignItems: 'center' }}>
               {isEditingTitle ? (
                 <input
-                  type="text"
-                  value={workoutTitle}
-                  onChange={(e) => setWorkoutTitle(e.target.value)}
-                  onBlur={() => setIsEditingTitle(false)}
-                  style={{ fontSize: '3.86vh', fontWeight: 650, border: 'none', outline: 'none', background: 'transparent', color: '#356B77', width: '100%' }}
-                />
+                type="text"
+                value={workoutTitle}
+                onChange={handleTitleChange}
+                onBlur={() => setIsEditingTitle(false)}
+                style={{ fontSize: '3.86vh', fontWeight: 650, border: 'none', outline: 'none', background: 'transparent', color: '#356B77', width: '100%' }}
+              />
               ) : (
                 <Text style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650 }}>
                   <i>{workoutTitle}</i>
