@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ActionIcon, Button, Card, Container, Grid, Group, Text, TextInput, Textarea } from '@mantine/core';
 import { MdAdd, MdChevronRight, MdDelete, MdEdit, MdExpandMore, MdRemoveCircleOutline } from 'react-icons/md';
+import storage from '../../utils/storage';
 
 function BodyweightExerciseCard({ 
   id,
@@ -14,6 +15,7 @@ function BodyweightExerciseCard({
   const [exerciseTitle, setExerciseTitle] = useState(title);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [notes, setNotes] = useState('');
+  const [previousWorkout, setPreviousWorkout] = useState(null);
   
   const [sets, setSets] = useState(() => {
     const savedSets = localStorage.getItem(`exercise-${id}-sets`);
@@ -24,6 +26,28 @@ function BodyweightExerciseCard({
       ? initialSets 
       : [{ setId: Date.now(), reps: '', timestamp: Date.now() }];
   });
+
+  useEffect(() => {
+    const workoutHistory = storage.history.getAll();
+    const sortedWorkouts = workoutHistory.sort((a, b) => 
+      new Date(b.date) - new Date(a.date)
+    );
+
+    const lastWorkout = sortedWorkouts.find(workout => 
+      workout.exercises.some(exercise => 
+        exercise.title.toLowerCase() === title.toLowerCase()
+      )
+    );
+
+    if (lastWorkout) {
+      const exercise = lastWorkout.exercises.find(ex => 
+        ex.title.toLowerCase() === title.toLowerCase()
+      );
+      if (exercise) {
+        setPreviousWorkout(exercise);
+      }
+    }
+  }, [title]);
 
   useEffect(() => {
     const savedNotes = localStorage.getItem(`exercise-${id}-notes`);
@@ -60,7 +84,7 @@ function BodyweightExerciseCard({
     const sanitizedValue = value.replace(/[^\d]/g, '');
     if (sanitizedValue.length > 1 && sanitizedValue[0] === '0') return;
 
-    const newSets = sets.map((set, i) => {
+    const newSets = sets.map((set, i) => {// BodyweightExerciseCard.js (continued)
       if (i === index) {
         return { 
           ...set, 
@@ -76,14 +100,14 @@ function BodyweightExerciseCard({
 
   const toggleEditMode = (e) => {
     e.stopPropagation();
-    if (editMode) setConfirmDelete(false); // Reset delete confirmation when exiting edit mode
+    if (editMode) setConfirmDelete(false);
     setEditMode(!editMode);
   };
 
   const handleExpand = () => {
     if (expanded && editMode) {
       setEditMode(false);
-      setConfirmDelete(false); // Reset delete confirmation when collapsing the card
+      setConfirmDelete(false);
     }
     setExpanded(!expanded);
   };
@@ -93,13 +117,13 @@ function BodyweightExerciseCard({
     if (confirmDelete) {
       onDelete();
     } else {
-      setConfirmDelete(true); // Show confirmation button
+      setConfirmDelete(true);
     }
   };
 
   const cancelDelete = (e) => {
     e.stopPropagation();
-    setConfirmDelete(false); // Revert back to the normal delete button
+    setConfirmDelete(false);
   };
 
   return (
@@ -137,11 +161,14 @@ function BodyweightExerciseCard({
         <Container>
           {sets.length > 0 && (
             <Grid align="center" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
-              <Grid.Col span={editMode ? 2.8 : 1}></Grid.Col>
-              <Grid.Col span={6}>
+              {editMode && <Grid.Col span={2}></Grid.Col>}
+              <Grid.Col span={2}>
+                <Text color="white" align="left"></Text>
+              </Grid.Col>
+              <Grid.Col span={editMode ? 4 : 4}>
                 <Text color="white" weight={500} align="center">Previous</Text>
               </Grid.Col>
-              <Grid.Col span={editMode ? 3: 5}>
+              <Grid.Col span={editMode ? 3 : 6}>
                 <Text color="white" align="center">Reps</Text>
               </Grid.Col>
             </Grid>
@@ -150,11 +177,11 @@ function BodyweightExerciseCard({
           {sets.map((set, index) => (
             <Grid key={set.setId} align="center" gutter="xs" style={{ marginBottom: '1.5rem' }}>
               {editMode && (
-                <Grid.Col span="auto" style={{ textAlign: 'center', maxWidth: 'auto' }}>
+                <Grid.Col span={2} style={{ textAlign: 'center' }}>
                   <ActionIcon
                     variant="transparent"
                     onClick={(e) => removeSet(index, e)}
-                    style={{ color:'red', backgroundColor: 'transparent' }}
+                    style={{ color: 'red', backgroundColor: 'transparent' }}
                   >
                     <MdRemoveCircleOutline size={20} />
                   </ActionIcon>
@@ -163,8 +190,12 @@ function BodyweightExerciseCard({
               <Grid.Col span={1}>
                 <Text color="white" style={{ textAlign: 'left' }}>{index + 1}</Text>
               </Grid.Col>
-              <Grid.Col span={6}>
-                <Text color="white" align="center">-- reps</Text>
+              <Grid.Col span={editMode ? 5 : 6}>
+                <Text color="white" align="center">
+                  {previousWorkout && previousWorkout.sets && previousWorkout.sets[index]
+                    ? `${previousWorkout.sets[index].reps} reps`
+                    : '-- reps'}
+                </Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 3 : 5}>
                 <TextInput
@@ -186,25 +217,10 @@ function BodyweightExerciseCard({
             </Grid>
           ))}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
-            <Text color="white" style={{ textAlign: 'left' }}>Notes</Text>
-            <Button
-              onClick={() => setNotes('')}
-              style={{
-                backgroundColor: 'transparent',
-                color: 'white',
-                fontWeight: '400',
-                borderRadius: '8px',
-                padding: '0.5rem 0.5rem',
-                fontSize: '1rem',
-                borderStyle: 'solid',
-                borderColor: 'white'
-              }}
-            >
-              Clear Notes
-            </Button>
-          </div>
-          <div>
+          <div style={{ marginTop: '15px' }}>
+            <Text weight={500} style={{ color: 'white', marginBottom: '5px' }}>
+              Notes:
+            </Text>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -288,7 +304,7 @@ function BodyweightExerciseCard({
                   borderRadius: '10px'
                 }}
               >
-                <MdDelete size={20} style={{ marginRight: '0.5rem', color: 'red' }} />
+                <MdDelete size={20} style={{ marginRight: '0.5rem' }} />
                 Delete Exercise
               </Button>
             )

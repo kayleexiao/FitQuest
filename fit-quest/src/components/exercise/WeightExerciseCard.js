@@ -1,6 +1,7 @@
-import { ActionIcon, Button, Card, Container, Grid, Group, Text, TextInput, Textarea } from '@mantine/core';
 import React, { useState, useEffect } from 'react';
+import { ActionIcon, Button, Card, Container, Grid, Group, Text, TextInput, Textarea } from '@mantine/core';
 import { MdAdd, MdChevronRight, MdDelete, MdEdit, MdExpandMore, MdRemoveCircleOutline } from 'react-icons/md';
+import storage from '../../utils/storage';
 
 function WeightExerciseCard({ 
   id,
@@ -12,19 +13,43 @@ function WeightExerciseCard({
   const [expanded, setExpanded] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [exerciseTitle, setExerciseTitle] = useState(title);
-  const [sets, setSets] = useState(initialSets.length > 0 
-    ? initialSets 
-    : [{ setId: Date.now(), reps: '', weight: '', timestamp: Date.now() }]
-  );
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [notes, setNotes] = useState('');
+  const [previousWorkout, setPreviousWorkout] = useState(null);
 
-  useEffect(() => {
+  const [sets, setSets] = useState(() => {
     const savedSets = localStorage.getItem(`exercise-${id}-sets`);
     if (savedSets) {
-      setSets(JSON.parse(savedSets));
+      return JSON.parse(savedSets);
     }
+    return initialSets.length > 0 
+      ? initialSets 
+      : [{ setId: Date.now(), reps: '', weight: '', timestamp: Date.now() }];
+  });
 
+  useEffect(() => {
+    const workoutHistory = storage.history.getAll();
+    const sortedWorkouts = workoutHistory.sort((a, b) => 
+      new Date(b.date) - new Date(a.date)
+    );
+
+    const lastWorkout = sortedWorkouts.find(workout => 
+      workout.exercises.some(exercise => 
+        exercise.title.toLowerCase() === title.toLowerCase()
+      )
+    );
+
+    if (lastWorkout) {
+      const exercise = lastWorkout.exercises.find(ex => 
+        ex.title.toLowerCase() === title.toLowerCase()
+      );
+      if (exercise) {
+        setPreviousWorkout(exercise);
+      }
+    }
+  }, [title]);
+
+  useEffect(() => {
     const savedNotes = localStorage.getItem(`exercise-${id}-notes`);
     if (savedNotes) {
       setNotes(savedNotes);
@@ -91,7 +116,7 @@ function WeightExerciseCard({
   const handleExpand = () => {
     if (expanded && editMode) {
       setEditMode(false);
-      setConfirmDelete(false); // Reset delete confirmation when collapsing the card
+      setConfirmDelete(false);
     }
     setExpanded(!expanded);
   };
@@ -107,7 +132,7 @@ function WeightExerciseCard({
 
   const cancelDelete = (e) => {
     e.stopPropagation();
-    setConfirmDelete(false); // Cancel delete confirmation
+    setConfirmDelete(false);
   };
 
   return (
@@ -165,10 +190,7 @@ function WeightExerciseCard({
                   <ActionIcon
                     variant="transparent"
                     onClick={(e) => removeSet(index, e)}
-                    style={{
-                      color: 'red',
-                      backgroundColor: 'transparent'
-                    }}
+                    style={{ color: 'red', backgroundColor: 'transparent' }}
                   >
                     <MdRemoveCircleOutline size={20} />
                   </ActionIcon>
@@ -178,7 +200,11 @@ function WeightExerciseCard({
                 <Text color="white" style={{ textAlign: 'left' }}>{index + 1}</Text>
               </Grid.Col>
               <Grid.Col span={5}>
-                <Text color="white" align="center">-- kg × -- reps</Text>
+                <Text color="white" align="center">
+                  {previousWorkout && previousWorkout.sets && previousWorkout.sets[index]
+                    ? `${previousWorkout.sets[index].weight}kg × ${previousWorkout.sets[index].reps} reps`
+                    : '-- kg × -- reps'}
+                </Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 2 : 3}>
                 <TextInput
@@ -217,25 +243,10 @@ function WeightExerciseCard({
             </Grid>
           ))}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
-            <Text color="white" style={{ textAlign: 'left' }}>Notes</Text>
-            <Button
-              onClick={() => setNotes('')}
-              style={{
-                backgroundColor: 'transparent',
-                color: 'white',
-                fontWeight: '400',
-                borderRadius: '8px',
-                padding: '0.5rem 0.5rem',
-                fontSize: '1rem',
-                borderStyle: 'solid',
-                borderColor: 'white'
-              }}
-            >
-              Clear Notes
-            </Button>
-          </div>
-          <div>
+          <div style={{ marginTop: '15px' }}>
+            <Text weight={500} style={{ color: 'white', marginBottom: '5px' }}>
+              Notes:
+            </Text>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}

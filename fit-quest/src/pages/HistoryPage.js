@@ -56,6 +56,7 @@ function HistoryPage() {
             title: exercise.title,
             sets: exercise.sets,
             type: exercise.type,
+            notes: exercise.notes
           })),
         },
         previousPage: '/history',

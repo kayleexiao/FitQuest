@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ActionIcon, Button, Card, Container, Grid, Group, Text, TextInput, Textarea } from '@mantine/core';
 import { MdAdd, MdChevronRight, MdDelete, MdEdit, MdExpandMore, MdRemoveCircleOutline } from 'react-icons/md';
+import storage from '../../utils/storage';
 
 function TimedExerciseCard({ 
   id,
@@ -16,6 +17,7 @@ function TimedExerciseCard({
   const [activeSet, setActiveSet] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [notes, setNotes] = useState('');
+  const [previousWorkout, setPreviousWorkout] = useState(null);
 
   const [sets, setSets] = useState(() => {
     const savedSets = localStorage.getItem(`exercise-${id}-sets`);
@@ -26,6 +28,28 @@ function TimedExerciseCard({
       ? initialSets 
       : [{ setId: Date.now(), time: 0, isActive: false, timestamp: Date.now() }];
   });
+
+  useEffect(() => {
+    const workoutHistory = storage.history.getAll();
+    const sortedWorkouts = workoutHistory.sort((a, b) => 
+      new Date(b.date) - new Date(a.date)
+    );
+
+    const lastWorkout = sortedWorkouts.find(workout => 
+      workout.exercises.some(exercise => 
+        exercise.title.toLowerCase() === title.toLowerCase()
+      )
+    );
+
+    if (lastWorkout) {
+      const exercise = lastWorkout.exercises.find(ex => 
+        ex.title.toLowerCase() === title.toLowerCase()
+      );
+      if (exercise) {
+        setPreviousWorkout(exercise);
+      }
+    }
+  }, [title]);
 
   // Timer effect
   useEffect(() => {
@@ -51,7 +75,6 @@ function TimedExerciseCard({
     }
   }, [id]);
 
-  // Save to localStorage effect - separate from timer effect
   useEffect(() => {
     if (onSetsChange) {
       onSetsChange(id, sets);
@@ -252,7 +275,11 @@ function TimedExerciseCard({
                 <Text color="white" style={{ textAlign: 'left' }}>{index + 1}</Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 5 : 6}>
-                <Text color="white" align="center">--:--:--</Text>
+                <Text color="white" align="center">
+                  {previousWorkout && previousWorkout.sets && previousWorkout.sets[index]
+                    ? formatTime(previousWorkout.sets[index].time)
+                    : '--:--:--'}
+                </Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 4 : 5}>
                 {editMode ? (
@@ -299,25 +326,10 @@ function TimedExerciseCard({
             </Grid>
           ))}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
-            <Text color="white" style={{ textAlign: 'left' }}>Notes</Text>
-            <Button
-              onClick={() => setNotes('')}
-              style={{
-                backgroundColor: 'transparent',
-                color: 'white',
-                fontWeight: '400',
-                borderRadius: '8px',
-                padding: '0.5rem 0.5rem',
-                fontSize: '1rem',
-                borderStyle: 'solid',
-                borderColor: 'white'
-              }}
-            >
-              Clear Notes
-            </Button>
-          </div>
-          <div>
+          <div style={{ marginTop: '15px' }}>
+            <Text weight={500} style={{ color: 'white', marginBottom: '5px' }}>
+              Notes:
+            </Text>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -360,7 +372,7 @@ function TimedExerciseCard({
             </Group>
           )}
 
-{editMode && confirmDelete ? (
+          {editMode && confirmDelete ? (
             <Group position="center" style={{ marginTop: '1rem' }}>
               <Button
                 onClick={handleDelete}
@@ -395,7 +407,6 @@ function TimedExerciseCard({
                 fullWidth
                 style={{
                   marginTop: '1rem',
-                  left: '2rem',
                   backgroundColor: 'red',
                   color: 'white',
                   fontWeight: 'bold',

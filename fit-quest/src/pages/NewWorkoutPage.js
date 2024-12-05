@@ -89,16 +89,18 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
         day: '2-digit'
       });
       
-      // Get the latest sets data from localStorage for each exercise
+      // Get the latest sets data and notes from localStorage for each exercise
       const updatedExercises = exercises.map(exercise => {
         const savedSets = localStorage.getItem(`exercise-${exercise.id}-sets`);
+        const savedNotes = localStorage.getItem(`exercise-${exercise.id}-notes`);
         return {
           ...exercise,
-          sets: savedSets ? JSON.parse(savedSets) : exercise.sets
+          sets: savedSets ? JSON.parse(savedSets) : exercise.sets,
+          notes: savedNotes || ''
         };
       });
       
-      // Format workout data for history with the updated sets
+      // Format workout data for history
       const workoutHistory = {
         title: workoutTitle || 'Workout',
         date: completionDate,
@@ -110,33 +112,31 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
             weight: set?.weight || 0,
             time: set?.time || 0,
             timestamp: set?.timestamp || 0
-          })) : []
+          })) : [],
+          notes: exercise.notes
         }))
       };
-
+  
       // Save to history
       storage.history.add(workoutHistory);
-
+  
       // Handle template saving/updating
       if (workoutTemplate) {
         // This is a workout started from saved page - update the template's last done date
+        // but DON'T update the template's exercises
         const savedTemplates = storage.templates.getAll();
         const updatedTemplates = savedTemplates.map(template => {
           if (template.title === workoutTemplate.title) {
             return {
               ...template,
-              lastDoneDate: formattedDate,
-              exercises: exercises.map(exercise => ({
-                title: exercise.title,
-                type: exercise.type
-              }))
+              lastDoneDate: formattedDate
             };
           }
           return template;
         });
         storage.templates.save(updatedTemplates);
       } else {
-        // This is a new workout - save it as a template
+        // Only save as new template if this wasn't started from a template
         const newTemplate = {
           title: workoutTitle,
           exercises: exercises.map(exercise => ({
@@ -148,7 +148,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
         };
         storage.templates.add(newTemplate);
       }
-
+  
       // Clear current workout
       storage.currentWorkout.clear();
       localStorage.removeItem('currentWorkoutTitle');
@@ -157,7 +157,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
       setExercises([]);
       setWorkoutTitle('New Workout');
       setIsSummaryModalOpen(false);
-
+  
       // Navigate to history page
       navigate('/history');
     } catch (error) {
@@ -263,47 +263,39 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
   const renderExerciseSets = (exercise) => {
     const savedSets = localStorage.getItem(`exercise-${exercise.id}-sets`);
     const exerciseSets = savedSets ? JSON.parse(savedSets) : exercise.sets;
-
+    const savedNotes = localStorage.getItem(`exercise-${exercise.id}-notes`);
+  
     return (
-      <div style={{ 
-        display: 'grid',
-        gap: '10px'
-      }}>
-        {exerciseSets && exerciseSets.map((set, setIndex) => (
-          <div 
-            key={set.setId || setIndex}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              backgroundColor: 'white',
-              padding: '12px 15px',
-              borderRadius: '8px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-            }}
-          >
-            <span style={{ fontWeight: 500 }}>Set {setIndex + 1}</span>
-            <span style={{ color: '#666' }}>
-              {exercise.type === 'weight' && set.weight && set.reps
-                ? `${set.weight}kg × ${set.reps} reps`
-                : exercise.type === 'bodyweight' && set.reps
-                ? `${set.reps} reps`
-                : exercise.type === 'timed' && set.time
-                ? `${formatTime(set.time)}`
-                : 'Not completed'}
-            </span>
-          </div>
-        ))}
-        {(!exerciseSets || exerciseSets.length === 0) && (
-          <div style={{
-            padding: '12px 15px',
-            color: '#666',
-            fontStyle: 'italic'
+      <>
+        {exerciseSets?.map((set, setIndex) => (
+          <Group key={setIndex} position="apart" style={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            marginBottom: '5px'
           }}>
-            No sets recorded
-          </div>
-        )}
-      </div>
+            <Text size="sm" style={{ color: 'white' }}>Set {setIndex + 1}</Text>
+            <Text size="sm" style={{ color: 'white' }}>
+              {exercise.type === 'weight'
+                ? `${set.weight}kg × ${set.reps} reps`
+                : exercise.type === 'bodyweight'
+                ? `${set.reps} reps`
+                : `${formatTime(set.time)}`}
+            </Text>
+          </Group>
+        ))}
+        <div style={{ marginTop: '15px' }}>
+          <Text weight={500} style={{ color: 'white', marginBottom: '5px' }}>
+            Notes:
+          </Text>
+          <Text style={{ 
+            color: 'rgba(255, 255, 255, 0.8)',
+            fontStyle: savedNotes ? 'normal' : 'italic'
+          }}>
+            {savedNotes || 'No notes added'}
+          </Text>
+        </div>
+      </>
     );
   };
 
@@ -519,8 +511,8 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
               alignItems: 'center',
               marginBottom: '20px'
             }}>
-              <h2 style={{ 
-                color: '#356B77', 
+              <h2 style={{
+                color: '#356B77',
                 margin: 0,
                 fontSize: '28px'
               }}>
@@ -532,23 +524,19 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
             </div>
 
             <div style={{ marginBottom: '30px' }}>
-              {exercises.map((exercise, index) => (
-                <div 
-                  key={exercise.id}
+              {exercises?.map((exercise, index) => (
+                <div
+                  key={index}
                   style={{
-                    backgroundColor: '#f5f5f5',
-                    borderRadius: '20px',
-                    padding: '20px',
-                    marginBottom: '15px'
+                    backgroundColor: '#879DA1',
+                    marginBottom: '1rem',
+                    padding: '15px',
+                    borderRadius: '15px',
                   }}
                 >
-                  <h3 style={{ 
-                    margin: '0 0 15px 0',
-                    color: '#356B77',
-                    fontSize: '20px'
-                  }}>
+                  <Text weight={500} style={{ color: 'white', marginBottom: '10px' }}>
                     {exercise.title}
-                  </h3>
+                  </Text>
                   {renderExerciseSets(exercise)}
                 </div>
               ))}
