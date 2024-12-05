@@ -126,6 +126,7 @@ function ExplorePage({ isWorkoutActive }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Weight Lifting');
   const [bookmarkedWorkouts, setBookmarkedWorkouts] = useState({});
+  const [confirmLogout, setConfirmLogout] = useState(false);
 
   // Load bookmarked workouts from storage on mount
   useEffect(() => {
@@ -203,6 +204,19 @@ function ExplorePage({ isWorkoutActive }) {
     });
   };
 
+  const handleLogout = () => {
+    if (confirmLogout) {
+      setConfirmLogout(false);
+      navigate("/")
+    } else {
+      setConfirmLogout(true);
+    }
+  };
+
+  const cancelLogout = () => {
+    setConfirmLogout(false);
+  };
+
   const { user } = useContext(UserContext);
 
   return (
@@ -211,23 +225,54 @@ function ExplorePage({ isWorkoutActive }) {
         <Statusbar />
       </div>
       <Container style={{ paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
-        <Button
-          variant="filled"
-          style={{
-            position: 'absolute',
-            backgroundColor: '#356B77',
-            color: 'white',
-            fontSize: '24px',
-            fontWeight: 500,
-            borderRadius: '15px',
-            width: '14vw',
-            marginLeft: '29vw',
-            marginTop: '4.5vh'
-          }}
-          onClick={() => navigate('/')}
-        >
-          <MdLogout/>
-        </Button>
+        {confirmLogout ? (
+          <div style={{ display: 'flex', gap: '4px', flexDirection: 'column', position: 'absolute', marginTop: '4.5vh', marginLeft: '65.65vw' }}>
+            <Button
+              onClick={() => cancelLogout()}
+              style={{
+                backgroundColor: 'grey',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: 500,
+                borderRadius: '15px',
+                width: '20vw',
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleLogout()}
+              style={{
+                backgroundColor: '#356B77',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: 500,
+                borderRadius: '15px',
+                width: '20vw',
+              }}
+            >
+              Logout
+            </Button>
+          </div>
+        ) : (
+          <Button
+            variant="filled"
+            style={{
+              position: 'absolute',
+              backgroundColor: '#356B77',
+              color: 'white',
+              fontSize: '24px',
+              fontWeight: 500,
+              borderRadius: '15px',
+              width: '20vw',
+              marginLeft: '23vw',
+              marginTop: '4.5vh'
+            }}
+            onClick={handleLogout}
+          >
+            <MdLogout/>
+          </Button>
+        )}
         <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem', marginBottom: '1rem', gap: 0 }}>
           <Group align="center" style={{ gap: '10px' }}>
             <Text style={{
