@@ -129,7 +129,7 @@ function HistoryPage() {
                 >
                   <Group position="apart" align="center">
                     <div>
-                      <Text weight={500} size="lg" style={{ color: 'white' }}>
+                      <Text weight={500} size="lg" style={{ color: 'white', width: '65vw', overflowWrap: 'break-word' }}>
                         {workout.title}
                       </Text>
                       <Group spacing="xs">
@@ -148,7 +148,6 @@ function HistoryPage() {
                       color: 'white',
                       fontSize: '24px',
                       fontWeight: 'bold',
-                      marginLeft: '25vw'
                     }}>
                       ›
                     </Text>

@@ -53,6 +53,7 @@ const WorkoutList = ({ items, isLoading }) => {
                 borderColor: 'white',
                 cursor: 'pointer',
                 position: 'relative',
+                overflowWrap: 'break-word',
               }}
             >
               {formatWorkoutContent(item)}

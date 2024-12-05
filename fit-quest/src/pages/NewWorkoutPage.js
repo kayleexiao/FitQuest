@@ -92,10 +92,20 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
       // Get the latest sets data and notes from localStorage for each exercise
       const updatedExercises = exercises.map(exercise => {
         const savedSets = localStorage.getItem(`exercise-${exercise.id}-sets`);
+        const parsedSets = savedSets ? JSON.parse(savedSets) : exercise.sets;
         const savedNotes = localStorage.getItem(`exercise-${exercise.id}-notes`);
+
+        const filteredSets = Array.isArray(parsedSets)
+        ? parsedSets.filter(set => 
+            (set?.reps && set.reps !== '') || 
+            (set?.weight && set.weight !== '') || 
+            (set?.time && set.time !== '')
+          )
+        : [];
+
         return {
           ...exercise,
-          sets: savedSets ? JSON.parse(savedSets) : exercise.sets,
+          sets: savedSets ? filteredSets : exercise.sets,
           notes: savedNotes || ''
         };
       });
@@ -289,7 +299,10 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
             Notes:
           </Text>
           <Text style={{ 
-            color: 'rgba(255, 255, 255, 0.8)',
+            color: 'white',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            padding: '8px 12px',
+            borderRadius: '8px',
             fontStyle: savedNotes ? 'normal' : 'italic'
           }}>
             {savedNotes || 'No notes added'}
@@ -509,16 +522,16 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: '20px'
+              marginBottom: '20px',
             }}>
               <h2 style={{
                 color: '#356B77',
                 margin: 0,
-                fontSize: '28px'
+                fontSize: '28px',
               }}>
                 {workoutTitle || 'Workout'} Complete!
               </h2>
-              <span style={{ color: '#666' }}>
+              <span style={{ color: '#666', }}>
                 {new Date().toLocaleDateString()}
               </span>
             </div>

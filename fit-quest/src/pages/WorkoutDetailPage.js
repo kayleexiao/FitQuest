@@ -108,14 +108,17 @@ function WorkoutDetailPage() {
         ))}
 
         {/* Notes Section */}
-        <div style={{ marginTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '15px' }}>
+        <div style={{ marginTop: '0px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '0px' }}>
           <Text weight={500} style={{ textAlign: 'left', color: 'white', marginBottom: '5px' }}>
             Notes:
           </Text>
-          <Text style={{ 
-            color: 'rgba(255, 255, 255, 0.8)',
+          <Text size="sm" style={{ 
+            color: 'white',
             fontStyle: exercise.notes ? 'normal' : 'italic',
-            textAlign: 'left'
+            textAlign: 'left',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            padding: '8px 12px',
+            borderRadius: '8px'
           }}>
             {exercise.notes || 'No notes added'}
           </Text>
