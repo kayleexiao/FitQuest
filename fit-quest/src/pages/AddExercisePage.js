@@ -54,7 +54,7 @@ function AddExercisePage() {
 
         <Button
           fullWidth
-          style={{ marginBottom: '2rem', backgroundColor: '#356B77', color: 'white', fontSize: '18px', borderRadius: '10px' }}
+          style={{ marginBottom: '2rem', backgroundColor: '#356B77', color: 'white', fontSize: '18px', borderRadius: '8px' }}
           onClick={handleCreateNewExercise}
         >
           Create New Exercise
@@ -83,7 +83,7 @@ function AddExercisePage() {
                 padding: '3px 1rem',
                 display: 'flex',
                 justifyContent: 'space-between',
-                borderRadius: '5rem',
+                borderRadius: '8rem',
               }}
               onClick={() => handleAddRecentExercise(exercise)}
             >

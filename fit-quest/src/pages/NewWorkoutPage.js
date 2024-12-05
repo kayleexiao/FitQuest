@@ -349,7 +349,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                   style={{
                     backgroundColor: 'grey',
                     color: 'white',
-                    borderRadius: '10px',
+                    borderRadius: '20px',
                     padding: '5px 10px',
                     fontSize: '14px',
                     height: '36px'
@@ -364,7 +364,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                   style={{
                     backgroundColor: 'red',
                     color: 'white',
-                    borderRadius: '10px',
+                    borderRadius: '20px',
                     padding: '5px 10px',
                     fontSize: '14px',
                     height: '36px'
@@ -382,7 +382,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                   backgroundColor: '#356B77',
                   color: 'white',
                   fontWeight: 'bold',
-                  borderRadius: '10px',
+                  borderRadius: '20px',
                   width: 'auto',
                   fontSize: '14px',
                   height: '36px'
@@ -483,7 +483,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
               color: 'white',
               fontSize: '1.7rem',
               fontWeight: 'bold',
-              borderRadius: '30px',
+              borderRadius: '20px',
               width: '100%',
               height: '3rem',
               textAlign: 'center',
@@ -537,7 +537,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                   key={exercise.id}
                   style={{
                     backgroundColor: '#f5f5f5',
-                    borderRadius: '10px',
+                    borderRadius: '20px',
                     padding: '20px',
                     marginBottom: '15px'
                   }}
@@ -563,7 +563,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                 onClick={() => setIsSummaryModalOpen(false)}
                 style={{
                   padding: '12px 25px',
-                  borderRadius: '8px',
+                  borderRadius: '20px',
                   border: 'none',
                   backgroundColor: '#f5f5f5',
                   color: '#666',
@@ -577,7 +577,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
                 onClick={handleCompleteWorkout}
                 style={{
                   padding: '12px 25px',
-                  borderRadius: '8px',
+                  borderRadius: '20px',
                   border: 'none',
                   backgroundColor: '#356B77',
                   color: 'white',

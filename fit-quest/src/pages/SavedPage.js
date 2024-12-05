@@ -108,13 +108,6 @@ function SavedPage() {
     setOpenMenu(null);
   };
 
-  const handleEdit = (e, index, item) => {
-    e.stopPropagation();
-    setSelectedWorkout(item);
-    setIsEditModalOpen(true);
-    setOpenMenu(null);
-  };
-
   const handleRemove = (e, index) => {
     e.stopPropagation();
     setConfirmationModal({
@@ -486,7 +479,7 @@ function SavedPage() {
                 style={{
                   width: '100%',
                   backgroundColor: '#879DA1',
-                  borderRadius: expandedItems[index] ? '25px 25px 0 0' : 25,
+                  borderRadius: expandedItems[index] ? '20px 20px 0 0' : 20,
                   padding: '15px 12px',
                   marginBottom: expandedItems[index] ? 0 : 10,
                   display: 'flex',
@@ -562,7 +555,7 @@ function SavedPage() {
                           right: 0,
                           top: '100%',
                           backgroundColor: 'white',
-                          borderRadius: '10px',
+                          borderRadius: '20px',
                           boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
                           zIndex: 1000,
                           minWidth: '120px',
@@ -613,7 +606,7 @@ function SavedPage() {
                   onClick={() => setExpandedItems(prev => ({...prev, [index]: false}))}  // Add click handler
                   style={{
                     backgroundColor: '#879DA1',
-                    borderRadius: '0 0 25px 25px',
+                    borderRadius: '0 0 20px 20px',
                     padding: '15px 12px',
                     marginBottom: 10,
                     color: 'white',
@@ -727,7 +720,7 @@ function SavedPage() {
                 style={{ flex: 1 }}
                 styles={{
                   input: {
-                    borderRadius: '8px',
+                    borderRadius: '20px',
                   }
                 }}
               />
@@ -737,7 +730,7 @@ function SavedPage() {
                   backgroundColor: '#356B77',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '8px',
+                  borderRadius: '20px',
                   padding: '8px 15px',
                   cursor: 'pointer',
                   fontSize: '14px'
@@ -759,7 +752,7 @@ function SavedPage() {
                   padding: '10px',
                   backgroundColor: '#f5f5f5',
                   marginBottom: '8px',
-                  borderRadius: '8px',
+                  borderRadius: '20px',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
@@ -771,7 +764,7 @@ function SavedPage() {
                       backgroundColor: '#ff4444',
                       color: 'white',
                       border: 'none',
-                      borderRadius: '5px',
+                      borderRadius: '20px',
                       padding: '5px 10px',
                       cursor: 'pointer',
                       fontSize: '14px'
@@ -846,7 +839,7 @@ function SavedPage() {
                 backgroundColor: '#f5f5f5',
                 color: '#666',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '20px',
                 padding: '8px 15px',
                 cursor: 'pointer',
                 fontSize: '14px'
@@ -860,7 +853,7 @@ function SavedPage() {
                 backgroundColor: '#ff4444',
                 color: 'white',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '20px',
                 padding: '8px 15px',
                 cursor: 'pointer',
                 fontSize: '14px'
@@ -903,7 +896,7 @@ function SavedPage() {
                 style={{
                   padding: '15px',
                   backgroundColor: '#f5f5f5',
-                  borderRadius: '10px',
+                  borderRadius: '20px',
                   marginBottom: '10px'
                 }}
               >
@@ -925,7 +918,7 @@ function SavedPage() {
                       backgroundColor: '#356B77',
                       color: 'white',
                       border: 'none',
-                      borderRadius: '8px',
+                      borderRadius: '20px',
                       padding: '8px 15px',
                       cursor: 'pointer',
                       fontSize: '14px'
@@ -989,7 +982,7 @@ function SavedPage() {
                 backgroundColor: '#f5f5f5',
                 color: '#666',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '20px',
                 padding: '8px 15px',
                 cursor: 'pointer',
                 fontSize: '14px'
@@ -1006,7 +999,7 @@ function SavedPage() {
                 backgroundColor: '#356B77',
                 color: 'white',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '20px',
                 padding: '8px 15px',
                 cursor: 'pointer',
                 fontSize: '14px'

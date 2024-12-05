@@ -219,7 +219,7 @@ function ExplorePage({ isWorkoutActive }) {
             color: 'white',
             fontSize: '24px',
             fontWeight: 500,
-            borderRadius: '3px',
+            borderRadius: '15px',
             width: '14vw',
             marginLeft: '29vw',
             marginTop: '4.5vh'
@@ -284,7 +284,7 @@ function ExplorePage({ isWorkoutActive }) {
                 <Box style={{
                   height: '3px',
                   backgroundColor: '#5FB7CD',
-                  borderRadius: '3px',
+                  borderRadius: '20px',
                   marginTop: '4px',
                   width: '100%'
                 }} />
@@ -318,6 +318,7 @@ function ExplorePage({ isWorkoutActive }) {
                   width: '100%',
                   position: 'relative',
                   cursor: 'pointer',
+                  borderRadius: '20px'
                 }}
               >
                 <div style={{ 

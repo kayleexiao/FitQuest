@@ -159,7 +159,8 @@ function CalendarPage() {
           padding: '0 10px',
           marginBottom: '2rem',
           maxHeight: '16vh',
-          overflowY: 'auto'
+          overflowY: 'auto',
+          borderRadius: '20px'
         }}>
           <WorkoutList 
             items={workouts}

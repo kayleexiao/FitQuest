@@ -217,7 +217,7 @@ function WeightExerciseCard({
             </Grid>
           ))}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
             <Text color="white" style={{ textAlign: 'left' }}>Notes</Text>
             <Button
               onClick={() => setNotes('')}
@@ -270,6 +270,7 @@ function WeightExerciseCard({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  marginTop: '10px'
                 }}
               >
                 <MdAdd size={20} />

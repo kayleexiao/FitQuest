@@ -20,7 +20,7 @@ const WorkoutList = ({ items, isLoading }) => {
 
   return (
     <div style={{
-      borderRadius: '10px',
+      borderRadius: '20px',
       backgroundColor: 'white',
     }}>
       <div style={{
@@ -44,11 +44,11 @@ const WorkoutList = ({ items, isLoading }) => {
               style={{
                 textAlign: 'left',
                 marginBottom: '7.5px',
-                padding: '10px',
-                borderRadius: '6px',
+                padding: '15px',
+                borderRadius: '20px',
                 boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
                 backgroundColor: '#879DA1',
-                fontSize: '1.72vh',
+                fontSize: '1.8vh',
                 color: 'white',
                 borderColor: 'white',
                 cursor: 'pointer',

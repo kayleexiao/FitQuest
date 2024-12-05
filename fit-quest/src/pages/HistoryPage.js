@@ -70,7 +70,7 @@ function HistoryPage() {
       </div>
       <Navbar />
       <Container style={{ paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
-        <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem', marginBottom: '1.5rem' }}>
+        <Group spacing={0} direction="column" align="flex-start" style={{ marginTop: '2rem' }}>
           <Text style={{
             textAlign: 'left',
             fontSize: '3.86vh',
@@ -121,7 +121,7 @@ function HistoryPage() {
                   style={{
                     width: '100%',
                     backgroundColor: '#879DA1',
-                    borderRadius: 25,
+                    borderRadius: '8px',
                     padding: '15px 20px',
                     marginBottom: '15px',
                   }}
