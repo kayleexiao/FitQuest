@@ -1,6 +1,6 @@
-import { ActionIcon, Button, Container, Group, Text } from '@mantine/core';
+import { ActionIcon, Button, Container, Text } from '@mantine/core';
 import React, { useState, useEffect } from 'react';
-import { MdBookmark, MdBookmarkBorder } from 'react-icons/md';
+import { MdBookmark, MdBookmarkBorder, MdArrowBack } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 import Statusbar from '../components/StatusBar';
@@ -140,16 +140,37 @@ function WorkoutPage() {
 
       <Container style={{ paddingBottom: '90px', paddingTop: '10px', maxWidth: '100%', margin: 'auto', overflowY: 'auto' }}>
         <Navbar />
+        
+        {/* Back Button */}
+        <div style={{ textAlign: 'left', marginTop: '2rem', marginLeft: '0' }}>
+          <ActionIcon
+            onClick={() => navigate('/explore')}
+            size="lg"
+            style={{ backgroundColor: 'transparent' }}
+          >
+            <MdArrowBack size={34} color="#356B77" />
+          </ActionIcon>
+        </div>
 
         {/* Title and Bookmark */}
-        <Group position="apart" style={{ marginTop: '3rem', justifyContent: 'space-between' }}>
-          <Text size="2xl" weight={700} style={{ fontSize: '30px', color: '#356B77' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          width: '100%',
+        }}>
+          <Text size="xl" weight={650} style={{
+            fontSize: '28px',
+            color: '#356B77',
+            flex: 1,
+            textAlign: 'left'
+          }}>
             <i>{workoutTitle}</i>
           </Text>
           <ActionIcon variant="transparent" onClick={handleBookmark}>
             {bookmarked ? <MdBookmark size={45} color="#356B77" /> : <MdBookmarkBorder size={45} color="#356B77" />}
           </ActionIcon>
-        </Group>
+        </div>
 
         {/* Difficulty Level */}
         <Text color="dimmed" size="l" style={{ textAlign: "left", marginBottom: '1rem', color: '#356B77' }}>

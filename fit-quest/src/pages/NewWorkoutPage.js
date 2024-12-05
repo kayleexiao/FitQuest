@@ -336,7 +336,7 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
             <ActionIcon
               variant="transparent"
               onClick={() => setIsEditingTitle((prev) => !prev)}
-              style={{ color: isEditingTitle ? '#1e90ff' : '#356B77', marginLeft: '8px' }}
+              style={{ color: isEditingTitle ? '#1e90ff' : '#356B77'}}
             >
               <MdEdit size={24} />
             </ActionIcon>
