@@ -41,7 +41,7 @@ function WorkoutDetailPage() {
         <Navbar />
         
         {/* Header */}
-        <Group position="apart" style={{ marginTop: '2rem', marginBottom: '1rem' }}>
+        <Group position="apart" style={{ marginTop: '2rem'}}>
           <ActionIcon 
             onClick={() => navigate(previousPage || '/history')} 
             size="lg" 
@@ -49,25 +49,25 @@ function WorkoutDetailPage() {
           >
             <MdArrowBack size={34} color="#356B77" />
           </ActionIcon>
-          <Text size="xl" weight={650} style={{ fontSize: '28px', color: '#356B77' }}>
+          <Text style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650  }}>
             <i>Workout Details</i>
           </Text>
         </Group>
 
         {/* Workout Info */}
-        <div style={{ marginBottom: '2rem' }}>
-          <Text size="xl" weight={700} style={{ color: '#356B77', marginBottom: '0.5rem' }}>
-            {workout.title}
+        <div style={{ textAlign: 'left' }}>
+          <Text size="xl" weight={650} style={{ fontSize: '30px', color: '#356B77', marginBottom: '0.5rem'}}>
+            <i>{workout.title}</i>
           </Text>
-          <Text size="sm" style={{ color: '#666' }}>
+          <Text size="md" style={{
+            color: '#666',
+            marginBottom: '2rem'
+          }}>
             {workoutDate} at {workout.time}
           </Text>
         </div>
 
         {/* Exercises */}
-        <Text size="lg" weight={500} style={{ color: '#356B77', marginBottom: '1rem' }}>
-          Exercises
-        </Text>
         {workout.exercises?.map((exercise, index) => (
           <Card
             key={index}

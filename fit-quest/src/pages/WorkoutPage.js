@@ -160,7 +160,7 @@ function WorkoutPage() {
           width: '100%',
         }}>
           <Text size="xl" weight={650} style={{
-            fontSize: '28px',
+            fontSize: '30px',
             color: '#356B77',
             flex: 1,
             textAlign: 'left'
