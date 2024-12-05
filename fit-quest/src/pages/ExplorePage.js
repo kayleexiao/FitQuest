@@ -360,6 +360,7 @@ function ExplorePage({ isWorkoutActive }) {
                   <div style={{ width: 'calc(100% - 60px)', overflow: 'hidden' }}>
                     <Text size="xl" weight={500} style={{
                       marginBottom: '4px',
+                      paddingBottom: '0.1rem',
                       textAlign: 'left',
                       fontSize: '20px',
                       whiteSpace: 'nowrap',
