@@ -82,12 +82,12 @@ To view the FitQuest app as a mobile device on your computer's web browser, foll
 ## **Login/Registration** 🔑
 Upon opening the app, you will be prompted to either login or create a new account. Please note that the registration functionality is hardcoded. You can use the register function, and the app's features will still work. However, your registration data will not be stored, so you won't be able to log in with it. To use the login feature, credentials must match the following users:
 ```bash
-{ email: 'email', password: 'password', firstName: 'Ethan' },
-{ email: 'test', password: '1234', firstName: 'Tiffany' },
-{ email: 'login', password: 'page', firstName: 'Leo' },
-{ email: 'cardio', password: 'beginner', firstName: 'Kody' },
+{ email: 'email', password: 'password', firstName: 'Ethan' }
+{ email: 'test', password: '1234', firstName: 'Tiffany' }
+{ email: 'login', password: 'page', firstName: 'Leo' }
+{ email: 'cardio', password: 'beginner', firstName: 'Kody' }
 { email: 'cyclist', password: 'experienced', firstName: 'Mia' }
-
+```
 ---
 
 ## **Conclusion** ✨
