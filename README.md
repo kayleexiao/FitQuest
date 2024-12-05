@@ -3,8 +3,6 @@
 [FitQuest](https://fitquest481.vercel.app/) is a fitness tracking application that helps users create custom workouts, explore predefined workout plans, save their favorite workouts, and log their workout history. The application relies on local storage to manage and persist user data without requiring a backend or external database.  
 [🔗 Visit FitQuest](https://fitquest481.vercel.app/)
 
----
-
 ### **Our Company** 🌟  
 FitQuest is a tech company specializing in the development of digital tools for the fitness industry, with the main focus being on a workout tracking platform. We strive to support fitness enthusiasts at every stage of their journey, offering tools that simplify and enhance the workout experience.
 
@@ -51,8 +49,6 @@ Or if you wish, you can download and run the app locally:
 ### **Prerequisites** ⚙️  
 1. A modern web browser (e.g., Google Chrome, Firefox, Safari).  
 2. [Node.js](https://nodejs.org/) installed on your system.  
-
----
 
 ### **Installation** 🔧  
 
