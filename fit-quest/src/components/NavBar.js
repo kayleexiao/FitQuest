@@ -3,9 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { Container } from '@mantine/core';
 import { MdOutlineExplore, MdAddCircleOutline, MdBookmarkBorder, MdHistory, MdOutlineCalendarMonth   } from "react-icons/md";
 
-function Navbar() {
+function Navbar({ isWorkoutInProgress }) {
   const location = useLocation();
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname.startsWith(path);
 
   return (
     <Container
@@ -16,28 +16,32 @@ function Navbar() {
         left: 0,
         right: 0,
         backgroundColor: '#326B77',
-        borderTopLeftRadius: '20px',
-        borderTopRightRadius: '20px',
-        padding: '20px 0',
+        borderTopLeftRadius: 'max(4.65vw, 2.15vh)',
+        borderTopRightRadius: 'max(4.65vw, 2.15vh)',
+        padding: 'min(4.65vw, 2.15vh) 0',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        zIndex: 9999
       }}
     >
-      <Link to="/" style={{ flex: 1, textAlign: 'center' }}>
-        <MdOutlineExplore color={isActive('/') ? 'white' : '#86B0BA'} size={32} />
-      </Link>
-      <Link to="/new-workout" style={{ flex: 1, textAlign: 'center' }}>
-        <MdAddCircleOutline color={isActive('/new-workout') ? 'white' : '#86B0BA'} size={32} />
+      <Link to="/explore" style={{ flex: 1, textAlign: 'center' }}>
+        <MdOutlineExplore color={isActive('/explore') ? 'white' : '#86B0BA'} size={'3.43vh'} />
       </Link>
       <Link to="/saved" style={{ flex: 1, textAlign: 'center' }}>
-        <MdBookmarkBorder color={isActive('/saved') ? 'white' : '#86B0BA'} size={32} />
+        <MdBookmarkBorder color={isActive('/saved') ? 'white' : '#86B0BA'} size={'3.43vh'} />
+      </Link>
+      <Link to="/new-workout" style={{ flex: 1, textAlign: 'center' }}>
+        <MdAddCircleOutline 
+          color={isActive('/new-workout') ? 'white' : '#86B0BA'} 
+          size={'4vh'} 
+        />
       </Link>
       <Link to="/history" style={{ flex: 1, textAlign: 'center' }}>
-        <MdHistory color={isActive('/history') ? 'white' : '#86B0BA'} size={32} />
+        <MdHistory color={isActive('/history') ? 'white' : '#86B0BA'} size={'3.43vh'} />
       </Link>
       <Link to="/calendar" style={{ flex: 1, textAlign: 'center' }}>
-        <MdOutlineCalendarMonth color={isActive('/calendar') ? 'white' : '#86B0BA'} size={32} />
+        <MdOutlineCalendarMonth color={isActive('/calendar') ? 'white' : '#86B0BA'} size={'3.43vh'} />
       </Link>
     </Container>
   );
