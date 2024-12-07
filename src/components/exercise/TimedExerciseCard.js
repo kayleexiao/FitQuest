@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ActionIcon, Button, Card, Container, Grid, Group, Text, TextInput, Textarea } from '@mantine/core';
 import { MdAdd, MdChevronRight, MdDelete, MdEdit, MdExpandMore, MdRemoveCircleOutline } from 'react-icons/md';
-import storage from '../../utils/storage';
 
 function TimedExerciseCard({ 
   id,
@@ -17,10 +16,9 @@ function TimedExerciseCard({
   const [activeSet, setActiveSet] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [notes, setNotes] = useState('');
-  const [previousWorkout, setPreviousWorkout] = useState(null);
 
   const [sets, setSets] = useState(() => {
-    const savedSets = localStorage.getItem(`exercise-${id}-sets`);
+    const savedSets = localStorage.getItem(`exercise-${title}-${id}-sets`);
     if (savedSets) {
       return JSON.parse(savedSets);
     }
@@ -28,28 +26,6 @@ function TimedExerciseCard({
       ? initialSets 
       : [{ setId: Date.now(), time: 0, isActive: false, timestamp: Date.now() }];
   });
-
-  useEffect(() => {
-    const workoutHistory = storage.history.getAll();
-    const sortedWorkouts = workoutHistory.sort((a, b) => 
-      new Date(b.date) - new Date(a.date)
-    );
-
-    const lastWorkout = sortedWorkouts.find(workout => 
-      workout.exercises.some(exercise => 
-        exercise.title.toLowerCase() === title.toLowerCase()
-      )
-    );
-
-    if (lastWorkout) {
-      const exercise = lastWorkout.exercises.find(ex => 
-        ex.title.toLowerCase() === title.toLowerCase()
-      );
-      if (exercise) {
-        setPreviousWorkout(exercise);
-      }
-    }
-  }, [title]);
 
   // Timer effect
   useEffect(() => {
@@ -69,19 +45,19 @@ function TimedExerciseCard({
   }, [activeSet, currentTime]);
 
   useEffect(() => {
-    const savedNotes = localStorage.getItem(`exercise-${id}-notes`);
+    const savedNotes = localStorage.getItem(`exercise-${title}-${id}-notes`);
     if (savedNotes) {
       setNotes(savedNotes);
     }
-  }, [id]);
+  }, [id, title]);
 
   useEffect(() => {
     if (onSetsChange) {
       onSetsChange(id, sets);
     }
-    localStorage.setItem(`exercise-${id}-sets`, JSON.stringify(sets));
-    localStorage.setItem(`exercise-${id}-notes`, notes);
-  }, [sets, notes, onSetsChange, id]);
+    localStorage.setItem(`exercise-${title}-${id}-sets`, JSON.stringify(sets));
+    localStorage.setItem(`exercise-${title}-${id}-notes`, notes);
+  }, [sets, notes, onSetsChange, id, title]);
 
   const formatTime = (seconds) => {
     const hrs = Math.floor(seconds / 3600);
@@ -191,6 +167,8 @@ function TimedExerciseCard({
   const handleDelete = (e) => {
     e.stopPropagation();
     if (confirmDelete) {
+      localStorage.removeItem(`exercise-${title}-${id}-sets`);
+      localStorage.removeItem(`exercise-${title}-${id}-notes`);
       onDelete();
       setActiveSet(null);
     } else {
@@ -202,6 +180,49 @@ function TimedExerciseCard({
     e.stopPropagation();
     setConfirmDelete(false);
   };
+
+  const findPR = (exerciseTitle) => {
+    const matchingSets = [];
+  
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+  
+      if (key.startsWith(`exercise-`) && key.includes(`-${exerciseTitle}-`) && key.endsWith(`-sets`)) {
+        const savedSets = localStorage.getItem(key);
+  
+        if (savedSets) {
+          try {
+            const parsedSets = JSON.parse(savedSets);
+            if (Array.isArray(parsedSets)) {
+              parsedSets.forEach((set) => {
+                const savedEntry = localStorage.getItem(`exercise-${exerciseTitle}-${set.setId}-saved`);
+                
+                if (savedEntry) {
+                  matchingSets.push(set);
+                }
+              });
+            }
+          } catch (error) {
+            console.error(`Error parsing sets for key ${key}:`, error);
+          }
+        }
+      }
+    }
+  
+    if (matchingSets.length === 0) {
+      return { time: 0 };
+    }
+  
+    return matchingSets.reduce((minSet, currentSet) => {
+      const currentTime = parseFloat(currentSet.time) || 0; // Use Infinity for invalid time
+      const minTime = parseFloat(minSet.time) || 0;
+  
+      if (currentTime > minTime) {
+        return currentSet;
+      }
+      return minSet;
+    }, { time: '00:00:00' });
+  };  
 
   return (
     <Card shadow="sm" padding="lg" style={{ marginBottom: '2rem', marginTop: '2rem', backgroundColor: '#879DA2', borderRadius: '8px' }}>
@@ -247,7 +268,7 @@ function TimedExerciseCard({
                 <Text color="white" align="left"></Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 4 : 4}>
-                <Text color="white" weight={500} align="center">Previous</Text>
+                <Text color="white" weight={500} align="center">Personal Best</Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 3 : 6}>
                 <Text color="white" align="center">Time</Text>
@@ -276,9 +297,12 @@ function TimedExerciseCard({
               </Grid.Col>
               <Grid.Col span={editMode ? 5 : 6}>
                 <Text color="white" align="center">
-                  {previousWorkout && previousWorkout.sets && previousWorkout.sets[index]
-                    ? formatTime(previousWorkout.sets[index].time)
-                    : '--:--:--'}
+                  {(() => {
+                    const highestSet = findPR(title);
+                    return highestSet && highestSet.time > 0
+                      ? `${formatTime(highestSet.time)}`
+                      : '--:--:--';
+                  })()}
                 </Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 4 : 5}>

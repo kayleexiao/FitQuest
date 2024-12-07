@@ -91,9 +91,9 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
       
       // Get the latest sets data and notes from localStorage for each exercise
       const updatedExercises = exercises.map(exercise => {
-        const savedSets = localStorage.getItem(`exercise-${exercise.id}-sets`);
+        const savedSets = localStorage.getItem(`exercise-${exercise.title}-${exercise.id}-sets`);
         const parsedSets = savedSets ? JSON.parse(savedSets) : exercise.sets;
-        const savedNotes = localStorage.getItem(`exercise-${exercise.id}-notes`);
+        const savedNotes = localStorage.getItem(`exercise-${exercise.title}-${exercise.id}-notes`);
 
         const filteredSets = Array.isArray(parsedSets)
         ? parsedSets.filter(set => 
@@ -102,6 +102,11 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
             (set?.time && set.time !== '')
           )
         : [];
+
+        filteredSets.forEach(set => {
+          // Update the saved flag for each set
+          localStorage.setItem(`exercise-${exercise.title}-${set.setId}-saved`, true);
+        });
 
         return {
           ...exercise,
@@ -271,9 +276,9 @@ const NewWorkoutPage = ({ setIsWorkoutInProgress }) => {
   };
 
   const renderExerciseSets = (exercise) => {
-    const savedSets = localStorage.getItem(`exercise-${exercise.id}-sets`);
+    const savedSets = localStorage.getItem(`exercise-${exercise.title}-${exercise.id}-sets`);
     const exerciseSets = savedSets ? JSON.parse(savedSets) : exercise.sets;
-    const savedNotes = localStorage.getItem(`exercise-${exercise.id}-notes`);
+    const savedNotes = localStorage.getItem(`exercise-${exercise.title}-${exercise.id}-notes`);
   
     return (
       <>
