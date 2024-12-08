@@ -90,5 +90,19 @@ Upon opening the app, you will be prompted to either login or create a new accou
 ```
 ---
 
+## **Video Demo Path**
+In this video, we explored the seamless experience of navigating through the app, showcasing its powerful features and user-friendly design.
+
+Registration: We began by registering a new account, setting the foundation for a personalized fitness journey.
+Explore Page: From there, we explored the "Bodyweight" and "Timed" workout tabs, highlighting diverse community-created routines. We selected a "Push" workout directly from the Explore Page to get started.
+Mid-Workout Tracking: During the "Push" workout, we logged sets, reps, and even added personal notes for each exercise, showing how easy it is to track progress in real time.
+Workout Summary: After completing the workout, we viewed a detailed summary of the session, reflecting on total sets, reps, weight lifted, and any personal records achieved.
+History Tab: Next, we visited the History Tab to see the completed "Push" workout, showcasing how users can easily track past sessions.
+Calendar Tab: We then moved to the Calendar Tab, where the completed "Push" workout was displayed, providing a clear view of workout consistency over time.
+Saved Page: Returning to the Explore Page, we saved a few favorite workouts, then navigated to the Saved Page to show how users can quickly access and revisit their preferred routines.
+Custom Workout Creation: Finally, we demonstrated starting a custom workout from scratch in the "New Workout" tab. We gave it a custom name, added exercises of all types—weight-based, bodyweight-based, and timed—and logged sets, reps, and notes for each, ensuring it met the user’s exact preferences and goals.
+This journey highlights how the app empowers users to discover, customize, and track their workouts with precision, ensuring every step of their fitness journey is as effective and enjoyable as possible.
+
+
 ## **Conclusion** ✨
 FitQuest is a comprehensive fitness application that provides users with a wide range of features to help them achieve their fitness goals. Whether you're a beginner or an experienced fitness enthusiast, FitQuest has something to offer. With its mobile-friendly design and user-friendly interface, FitQuest makes it easy to stay on top of your workout routine and track your progress over time.
