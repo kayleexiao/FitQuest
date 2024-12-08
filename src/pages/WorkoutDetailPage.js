@@ -30,101 +30,53 @@ function WorkoutDetailPage() {
     return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  const getPreviousWorkoutData = (exerciseTitle) => {
-    const workouts = storage.history.getAll();
-    const currentWorkoutDate = new Date(workout.date);
+  const getPersonalRecord = (exerciseTitle, type) => {
+    return storage.personalRecords.get(exerciseTitle, type);
+  };
+
+  const renderPersonalRecord = (exercise) => {
+    if (exercise.type === 'timed') return null;
     
-    // Find the most recent workout before the current one that contains this exercise
-    const previousWorkout = workouts
-      .filter(w => new Date(w.date) < currentWorkoutDate)
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .find(w => w.exercises.some(e => e.title.toLowerCase() === exerciseTitle.toLowerCase()));
+    const record = getPersonalRecord(exercise.title, exercise.type);
+    if (!record) return null;
 
-    if (previousWorkout) {
-      const exercise = previousWorkout.exercises.find(e => 
-        e.title.toLowerCase() === exerciseTitle.toLowerCase()
-      );
-      if (exercise && exercise.sets) {
-        return exercise.sets;
-      }
-    }
-    return null;
-  };
-
-  const formatSetData = (set, type) => {
-    if (!set) {
-      if (type === 'weight')
-        return '--rep×--weight';
-      else if (type === 'bodyweight')
-        return '--rep'
-      else if (type === 'timed')
-        return '--:--:--'
-    };
-
-    switch (type) {
-      case 'weight':
-        return `${set.weight}kg × ${set.reps} reps`;
-      case 'bodyweight':
-        return `${set.reps} reps`;
-      case 'timed':
-        return formatTime(set.time);
-      default:
-        return '--';
-    }
-  };
-
-  const renderSets = (exercise) => {
-    console.log('Exercise with notes:', exercise);
-    const previousSets = getPreviousWorkoutData(exercise.title);
-
-    return (
-      <>
-        {exercise.sets?.map((set, setIndex) => (
-          <div key={setIndex} style={{ marginBottom: '15px' }}>
-            <Group position="apart" style={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.15)',
-              padding: '8px 12px',
-              borderRadius: '8px',
-              marginBottom: '5px'
-            }}>
-              <Text size="sm" style={{ color: 'white' }}>Set {setIndex + 1} Previous:</Text>
-              <Text size="sm" style={{ color: 'white' }}>
-                {previousSets && previousSets[setIndex] 
-                  ? formatSetData(previousSets[setIndex], exercise.type)
-                  : '-- × --'}
-              </Text>
-            </Group>
-            <Group position="apart" style={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              padding: '8px 12px',
-              borderRadius: '8px'
-            }}>
-              <Text size="sm" style={{ color: 'white' }}>Current:</Text>
-              <Text size="sm" style={{ color: 'white' }}>
-                {formatSetData(set, exercise.type)}
-              </Text>
-            </Group>
-          </div>
-        ))}
-
-        {/* Notes Section */}
-        <div style={{ marginTop: '0px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '0px' }}>
-          <Text weight={500} style={{ textAlign: 'left', color: 'white', marginBottom: '5px' }}>
-            Notes:
-          </Text>
-          <Text size="sm" style={{ 
-            color: 'white',
-            fontStyle: exercise.notes ? 'normal' : 'italic',
-            textAlign: 'left',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            padding: '8px 12px',
-            borderRadius: '8px'
-          }}>
-            {exercise.notes || 'No notes added'}
+    if (exercise.type === 'weight') {
+      return (
+        <div style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          padding: '8px 12px',
+          borderRadius: '8px',
+          marginBottom: '10px',
+          fontSize: '0.9em'
+        }}>
+          <Text color="white">
+            Personal Record: {record.weight}kg × {record.reps} reps
+            <br />
+            <span style={{ fontSize: '0.8em' }}>
+              {new Date(record.date).toLocaleDateString()}
+            </span>
           </Text>
         </div>
-      </>
-    );
+      );
+    } else if (exercise.type === 'bodyweight') {
+      return (
+        <div style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          padding: '8px 12px',
+          borderRadius: '8px',
+          marginBottom: '10px',
+          fontSize: '0.9em'
+        }}>
+          <Text color="white">
+            Personal Record: {record.reps} reps
+            <br />
+            <span style={{ fontSize: '0.8em' }}>
+              {new Date(record.date).toLocaleDateString()}
+            </span>
+          </Text>
+        </div>
+      );
+    }
   };
 
   return (
@@ -137,7 +89,7 @@ function WorkoutDetailPage() {
         <Navbar />
         
         {/* Header */}
-        <Group position="apart" style={{ marginTop: '2rem' }}>
+        <Group position="apart" style={{ marginTop: '2rem'}}>
           <ActionIcon 
             onClick={() => navigate(previousPage || '/history')} 
             size="lg" 
@@ -145,14 +97,14 @@ function WorkoutDetailPage() {
           >
             <MdArrowBack size={34} color="#356B77" />
           </ActionIcon>
-          <Text style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650 }}>
+          <Text style={{ fontSize: '3.86vh', color: '#356B77', fontWeight: 650  }}>
             <i>Workout Details</i>
           </Text>
         </Group>
 
         {/* Workout Info */}
         <div style={{ textAlign: 'left' }}>
-          <Text size="xl" weight={650} style={{ fontSize: '30px', color: '#356B77', marginBottom: '0.5rem' }}>
+          <Text size="xl" weight={650} style={{ fontSize: '30px', color: '#356B77', marginBottom: '0.5rem'}}>
             <i>{workout.title}</i>
           </Text>
           <Text size="md" style={{
@@ -163,7 +115,6 @@ function WorkoutDetailPage() {
           </Text>
         </div>
 
-        {/* Exercises */}
         {workout.exercises?.map((exercise, index) => (
           <Card
             key={index}
@@ -174,10 +125,40 @@ function WorkoutDetailPage() {
               borderRadius: '15px',
             }}
           >
-            <Text weight={500} style={{ textAlign: 'left', color: 'white', marginBottom: '15px', fontSize: '18px' }}>
+            <Text weight={500} style={{ color: 'white', marginBottom: '10px' }}>
               {exercise.title}
             </Text>
-            {renderSets(exercise)}
+            
+            {/* Personal Record Display (if you have it) */}
+            {renderPersonalRecord && renderPersonalRecord(exercise)}
+
+            {exercise.sets?.map((set, setIndex) => (
+              <Group key={setIndex} position="apart" style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                marginBottom: '5px'
+              }}>
+                <Text size="sm" style={{ color: 'white' }}>Set {setIndex + 1}</Text>
+                <Text size="sm" style={{ color: 'white' }}>
+                  {exercise.type === 'weight'
+                    ? `${set.weight}kg × ${set.reps} reps`
+                    : exercise.type === 'bodyweight'
+                    ? `${set.reps} reps`
+                    : `${formatTime(set.time)} seconds`}
+                </Text>
+              </Group>
+            ))}
+            <Text weight={500} style={{ color: 'white', marginBottom: '10px', marginTop: '15px' }}>
+              {'Notes'}
+            </Text>
+            <Text style={{
+              color: exercise.notes ? 'white' : 'rgba(255, 255, 255, 0.7)',
+              marginBottom: '10px',
+              fontStyle: exercise.notes ? 'normal' : 'italic'
+            }}>
+              {exercise.notes || 'No notes added'}
+            </Text>
           </Card>
         ))}
       </Container>

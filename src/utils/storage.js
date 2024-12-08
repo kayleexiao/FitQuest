@@ -6,7 +6,8 @@ const STORAGE_KEYS = {
   RECENT_EXERCISES: 'recentExercises',
   CALENDAR_EVENTS: 'calendarEvents',
   DELETED_WORKOUTS: 'deletedWorkouts',
-  EXERCISE_HISTORY: 'exerciseHistory'
+  EXERCISE_HISTORY: 'exerciseHistory',
+  PERSONAL_RECORDS: 'personalRecords'
 };
 
 // Basic CRUD operations for localStorage
@@ -181,6 +182,47 @@ const storage = {
         return true;
       }
       return false;
+    }
+  },
+
+  // Personal Records Operations
+  personalRecords: {
+    getAll: () => storage.get(STORAGE_KEYS.PERSONAL_RECORDS, {}),
+    
+    // Get PR for specific exercise
+    get: (exerciseTitle, type) => {
+      const records = storage.get(STORAGE_KEYS.PERSONAL_RECORDS, {});
+      return records[`${exerciseTitle}-${type}`] || null;
+    },
+    
+    // Update PR for an exercise
+    update: (exerciseTitle, type, newRecord) => {
+      const records = storage.get(STORAGE_KEYS.PERSONAL_RECORDS, {});
+      const key = `${exerciseTitle}-${type}`;
+      const currentRecord = records[key];
+      
+      // For weight exercises
+      if (type === 'weight') {
+        if (!currentRecord || 
+            newRecord.weight > currentRecord.weight || 
+            (newRecord.weight === currentRecord.weight && newRecord.reps > currentRecord.reps)) {
+          records[key] = {
+            ...newRecord,
+            date: new Date().toISOString()
+          };
+        }
+      } 
+      // For bodyweight exercises
+      else if (type === 'bodyweight') {
+        if (!currentRecord || newRecord.reps > currentRecord.reps) {
+          records[key] = {
+            ...newRecord,
+            date: new Date().toISOString()
+          };
+        }
+      }
+      
+      return storage.set(STORAGE_KEYS.PERSONAL_RECORDS, records);
     }
   }
 };

@@ -16,6 +16,7 @@ function BodyweightExerciseCard({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [notes, setNotes] = useState('');
   const [previousWorkout, setPreviousWorkout] = useState(null);
+  const [personalRecord, setPersonalRecord] = useState(null);
   
   const [sets, setSets] = useState(() => {
     const savedSets = localStorage.getItem(`exercise-${id}-sets`);
@@ -64,6 +65,13 @@ function BodyweightExerciseCard({
     localStorage.setItem(`exercise-${id}-notes`, notes);
   }, [sets, notes, onSetsChange, id]);
 
+  useEffect(() => {
+    const record = storage.personalRecords.get(exerciseTitle, 'bodyweight');
+    if (record) {
+      setPersonalRecord(record);
+    }
+  }, [exerciseTitle]);  
+
   const addSet = (e) => {
     e.stopPropagation();
     const newSet = {
@@ -83,14 +91,30 @@ function BodyweightExerciseCard({
   const handleInputChange = (index, value) => {
     const sanitizedValue = value.replace(/[^\d]/g, '');
     if (sanitizedValue.length > 1 && sanitizedValue[0] === '0') return;
-
-    const newSets = sets.map((set, i) => {// BodyweightExerciseCard.js (continued)
+  
+    const newSets = sets.map((set, i) => {
       if (i === index) {
-        return { 
+        const updatedSet = { 
           ...set, 
           reps: sanitizedValue,
           timestamp: Date.now()
         };
+        
+        // Check for PR
+        const newRecord = {
+          reps: parseInt(sanitizedValue)
+        };
+        
+        if (!isNaN(newRecord.reps)) {
+          storage.personalRecords.update(exerciseTitle, 'bodyweight', newRecord);
+          // Reload PR after update
+          const updatedRecord = storage.personalRecords.get(exerciseTitle, 'bodyweight');
+          if (updatedRecord) {
+            setPersonalRecord(updatedRecord);
+          }
+        }
+        
+        return updatedSet;
       }
       return set;
     });
@@ -159,6 +183,26 @@ function BodyweightExerciseCard({
 
       {expanded && (
         <Container>
+        {personalRecord && (
+          <Text 
+            color="white" 
+            size="sm" 
+            style={{ 
+              marginTop: '1rem',
+              marginBottom: '1rem',
+              textAlign: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              padding: '8px',
+              borderRadius: '4px'
+            }}
+          >
+            Personal Record: {personalRecord.reps} reps
+            <br />
+            <span style={{ fontSize: '0.8em' }}>
+              {new Date(personalRecord.date).toLocaleDateString()}
+            </span>
+          </Text>
+        )}
           {sets.length > 0 && (
             <Grid align="center" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
               {editMode && <Grid.Col span={2}></Grid.Col>}

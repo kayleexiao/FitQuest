@@ -16,6 +16,8 @@ function WeightExerciseCard({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [notes, setNotes] = useState('');
   const [previousWorkout, setPreviousWorkout] = useState(null);
+  const [personalRecord, setPersonalRecord] = useState(null);
+
 
   const [sets, setSets] = useState(() => {
     const savedSets = localStorage.getItem(`exercise-${id}-sets`);
@@ -64,6 +66,13 @@ function WeightExerciseCard({
     localStorage.setItem(`exercise-${id}-notes`, notes);
   }, [sets, notes, onSetsChange, id]);
 
+  useEffect(() => {
+    const record = storage.personalRecords.get(exerciseTitle, 'weight');
+    if (record) {
+      setPersonalRecord(record);
+    }
+  }, [exerciseTitle]);
+
   const addSet = (e) => {
     e.stopPropagation();
     const newSet = {
@@ -82,26 +91,36 @@ function WeightExerciseCard({
   };
 
   const handleInputChange = (index, field, value) => {
-    const sanitizedValue = field === 'weight' 
+    const sanitizedValue = field === 'weight'
       ? value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')
       : value.replace(/[^\d]/g, '');
 
-    if (field === 'weight' && sanitizedValue.includes('.')) {
-      const [, decimal] = sanitizedValue.split('.');
-      if (decimal && decimal.length > 2) return;
-    }
-
-    if (sanitizedValue.length > 1 && sanitizedValue[0] === '0' && sanitizedValue[1] !== '.') return;
-
-    const newSets = sets.map((set, i) => {
-      if (i === index) {
-        return { 
-          ...set, 
-          [field]: sanitizedValue,
-          timestamp: Date.now()
-        };
-      }
-      return set;
+      const newSets = sets.map((set, i) => {
+        if (i === index) {
+          const updatedSet = {
+            ...set,
+            [field]: sanitizedValue,
+            timestamp: Date.now()
+          };
+          
+          // Check for PR when both weight and reps are entered
+          if ((field === 'weight' && set.reps) || (field === 'reps' && set.weight)) {
+            const newRecord = {
+              weight: parseFloat(field === 'weight' ? sanitizedValue : set.weight),
+              reps: parseInt(field === 'reps' ? sanitizedValue : set.reps)
+            };
+            
+            storage.personalRecords.update(exerciseTitle, 'weight', newRecord);
+            // Reload PR after update
+            const updatedRecord = storage.personalRecords.get(exerciseTitle, 'weight');
+            if (updatedRecord) {
+              setPersonalRecord(updatedRecord);
+            }
+          }
+          
+          return updatedSet;
+        }
+        return set;
     });
 
     setSets(newSets);
@@ -168,6 +187,26 @@ function WeightExerciseCard({
 
       {expanded && (
         <Container>
+        {personalRecord && (
+          <Text
+            color="white"
+            size="sm"
+            style={{
+              marginTop: '1rem',
+              marginBottom: '1rem',
+              textAlign: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              padding: '8px',
+              borderRadius: '4px'
+            }}
+          >
+            Personal Record: {personalRecord.weight}kg × {personalRecord.reps} reps
+            <br />
+            <span style={{ fontSize: '0.8em' }}>
+              {new Date(personalRecord.date).toLocaleDateString()}
+            </span>
+          </Text>
+        )}
           {sets.length > 0 && (
             <Grid align="center" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
               <Grid.Col span={editMode ? 2.8 : 1}></Grid.Col>

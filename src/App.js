@@ -15,7 +15,7 @@ import WorkoutPage from './pages/WorkoutPage';
 import { UserProvider } from "./UserContext";
 
 function App() {
-  const[isWorkoutInProgress, setIsWorkoutInProgress] = useState(false);
+  const [setIsWorkoutInProgress] = useState(false);
 
   return (
     <Container style={{ padding: "1rem", textAlign: "center" }}>
