@@ -20,7 +20,7 @@ function TimedExerciseCard({
   const [previousWorkout, setPreviousWorkout] = useState(null);
 
   const [sets, setSets] = useState(() => {
-    const savedSets = localStorage.getItem(`exercise-${title}-${id}-sets`);
+    const savedSets = localStorage.getItem(`exercise-${id}-sets`);
     if (savedSets) {
       return JSON.parse(savedSets);
     }
@@ -69,19 +69,19 @@ function TimedExerciseCard({
   }, [activeSet, currentTime]);
 
   useEffect(() => {
-    const savedNotes = localStorage.getItem(`exercise-${title}-${id}-notes`);
+    const savedNotes = localStorage.getItem(`exercise-${id}-notes`);
     if (savedNotes) {
       setNotes(savedNotes);
     }
-  }, [id, title]);
+  }, [id]);
 
   useEffect(() => {
     if (onSetsChange) {
       onSetsChange(id, sets);
     }
-    localStorage.setItem(`exercise-${title}-${id}-sets`, JSON.stringify(sets));
-    localStorage.setItem(`exercise-${title}-${id}-notes`, notes);
-  }, [sets, notes, onSetsChange, id, title]);
+    localStorage.setItem(`exercise-${id}-sets`, JSON.stringify(sets));
+    localStorage.setItem(`exercise-${id}-notes`, notes);
+  }, [sets, notes, onSetsChange, id]);
 
   const formatTime = (seconds) => {
     const hrs = Math.floor(seconds / 3600);
@@ -191,8 +191,6 @@ function TimedExerciseCard({
   const handleDelete = (e) => {
     e.stopPropagation();
     if (confirmDelete) {
-      localStorage.removeItem(`exercise-${title}-${id}-sets`);
-      localStorage.removeItem(`exercise-${title}-${id}-notes`);
       onDelete();
       setActiveSet(null);
     } else {

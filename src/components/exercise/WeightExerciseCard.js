@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ActionIcon, Button, Card, Container, Grid, Group, Text, TextInput, Textarea } from '@mantine/core';
 import { MdAdd, MdChevronRight, MdDelete, MdEdit, MdExpandMore, MdRemoveCircleOutline } from 'react-icons/md';
+import storage from '../../utils/storage';
 
 function WeightExerciseCard({ 
   id,
@@ -14,9 +15,10 @@ function WeightExerciseCard({
   const [exerciseTitle, setExerciseTitle] = useState(title);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [notes, setNotes] = useState('');
+  const [previousWorkout, setPreviousWorkout] = useState(null);
 
   const [sets, setSets] = useState(() => {
-    const savedSets = localStorage.getItem(`exercise-${title}-${id}-sets`);
+    const savedSets = localStorage.getItem(`exercise-${id}-sets`);
     if (savedSets) {
       return JSON.parse(savedSets);
     }
@@ -26,19 +28,41 @@ function WeightExerciseCard({
   });
 
   useEffect(() => {
-    const savedNotes = localStorage.getItem(`exercise-${title}-${id}-notes`);
+    const workoutHistory = storage.history.getAll();
+    const sortedWorkouts = workoutHistory.sort((a, b) => 
+      new Date(b.date) - new Date(a.date)
+    );
+
+    const lastWorkout = sortedWorkouts.find(workout => 
+      workout.exercises.some(exercise => 
+        exercise.title.toLowerCase() === title.toLowerCase()
+      )
+    );
+
+    if (lastWorkout) {
+      const exercise = lastWorkout.exercises.find(ex => 
+        ex.title.toLowerCase() === title.toLowerCase()
+      );
+      if (exercise) {
+        setPreviousWorkout(exercise);
+      }
+    }
+  }, [title]);
+
+  useEffect(() => {
+    const savedNotes = localStorage.getItem(`exercise-${id}-notes`);
     if (savedNotes) {
       setNotes(savedNotes);
     }
-  }, [id, title]);
+  }, [id]);
 
   useEffect(() => {
     if (onSetsChange) {
       onSetsChange(id, sets);
     }
-    localStorage.setItem(`exercise-${title}-${id}-sets`, JSON.stringify(sets));
-    localStorage.setItem(`exercise-${title}-${id}-notes`, notes);
-  }, [sets, notes, onSetsChange, id, title]);
+    localStorage.setItem(`exercise-${id}-sets`, JSON.stringify(sets));
+    localStorage.setItem(`exercise-${id}-notes`, notes);
+  }, [sets, notes, onSetsChange, id]);
 
   const addSet = (e) => {
     e.stopPropagation();
@@ -100,8 +124,6 @@ function WeightExerciseCard({
   const handleDelete = (e) => {
     e.stopPropagation();
     if (confirmDelete) {
-      localStorage.removeItem(`exercise-${title}-${id}-sets`);
-      localStorage.removeItem(`exercise-${title}-${id}-notes`);
       onDelete();
     } else {
       setConfirmDelete(true);
@@ -113,52 +135,6 @@ function WeightExerciseCard({
     setConfirmDelete(false);
   };
 
-  const findPR = (exerciseTitle) => {
-    const matchingSets = [];
-  
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-  
-      if (key.startsWith(`exercise-`) && key.includes(`-${exerciseTitle}-`) && key.endsWith(`-sets`)) {
-        const savedSets = localStorage.getItem(key);
-  
-        if (savedSets) {
-          try {
-            const parsedSets = JSON.parse(savedSets);
-            if (Array.isArray(parsedSets)) {
-              parsedSets.forEach((set) => {
-                const savedEntry = localStorage.getItem(`exercise-${exerciseTitle}-${set.setId}-saved`);
-                
-                if (savedEntry) {
-                  matchingSets.push(set);
-                }
-              });
-            }
-          } catch (error) {
-            console.error(`Error parsing sets for key ${key}:`, error);
-          }
-        }
-      }
-    }
-  
-    if (matchingSets.length === 0) {
-      return { weight: 0, reps: 0 };
-    }
-  
-    return matchingSets.reduce((maxSet, currentSet) => {
-      const currentWeight = parseFloat(currentSet.weight) || 0;
-      const maxWeight = parseFloat(maxSet.weight) || 0;
-  
-      const currentReps = parseFloat(currentSet.reps) || 0;
-      const maxReps = parseFloat(maxSet.reps) || 0;
-  
-      if (currentWeight > maxWeight || (currentWeight === maxWeight && currentReps > maxReps)) {
-        return currentSet;
-      }
-      return maxSet;
-    }, { weight: 0, reps: 0 });
-  };
-  
   return (
     <Card shadow="sm" padding="lg" style={{ marginBottom: '2rem', marginTop: '2rem', backgroundColor: '#879DA2', borderRadius: '8px' }}>
       <Group position="apart" align="center" style={{ cursor: 'pointer' }} onClick={handleExpand}>
@@ -196,7 +172,7 @@ function WeightExerciseCard({
             <Grid align="center" style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
               <Grid.Col span={editMode ? 2.8 : 1}></Grid.Col>
               <Grid.Col span={5}>
-                <Text color="white" weight={500} align="center">Personal Best</Text>
+                <Text color="white" weight={500} align="center">Previous</Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 2 : 3}>
                 <Text color="white" align="center">Reps</Text>
@@ -225,12 +201,9 @@ function WeightExerciseCard({
               </Grid.Col>
               <Grid.Col span={5}>
                 <Text color="white" align="center">
-                  {(() => {
-                    const highestSet = findPR(title);
-                    return highestSet && highestSet.weight > 0
-                      ? `${highestSet.weight}kg × ${highestSet.reps} reps`
-                      : '-- kg × -- reps';
-                  })()}
+                  {previousWorkout && previousWorkout.sets && previousWorkout.sets[index]
+                    ? `${previousWorkout.sets[index].weight}kg × ${previousWorkout.sets[index].reps} reps`
+                    : '-- kg × -- reps'}
                 </Text>
               </Grid.Col>
               <Grid.Col span={editMode ? 2 : 3}>
