@@ -139,9 +139,15 @@ function SavedPage() {
     if (searchQuery) {
       filteredItems = filteredItems.filter(item => 
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.exercises.some(exercise => 
-          exercise.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        (Array.isArray(item.exercises) && item.exercises.some(exercise => {
+          if (typeof exercise === "string") {
+            return exercise.toLowerCase().includes(searchQuery.toLowerCase());
+          }
+          if (exercise && typeof exercise.title === "string") {
+            return exercise.title.toLowerCase().includes(searchQuery.toLowerCase());
+          }
+          return false;
+        }))
       );
     }
     
